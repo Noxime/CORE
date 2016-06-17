@@ -3,12 +3,12 @@
 #include "Platform.h"
 #include <vector>
 
-class RenderingEngine;
+class VulkanEngine;
 
 class Window
 {
 public:
-	Window(RenderingEngine *renderer, uint32_t width, uint32_t height, std::string title, bool requestedVsync);
+	Window(VulkanEngine *renderer, uint32_t width, uint32_t height, std::string title, bool requestedVsync);
 	~Window();
 
 	void close(); //Close the window dude, someone is watching your screen over your shoulder
@@ -30,7 +30,7 @@ private:
 	void initSwapchainImages();
 	void destroySwapchainImages();
 
-	RenderingEngine *m_renderer  = nullptr; //The rendering engine, duh
+	VulkanEngine *m_renderer  = nullptr; //The rendering engine, duh
 	VkSurfaceKHR     m_surface   = VK_NULL_HANDLE; //Graphgics surface
 	VkSwapchainKHR   m_swapchain = VK_NULL_HANDLE; //Swapchain
 

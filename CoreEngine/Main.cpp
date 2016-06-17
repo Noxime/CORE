@@ -1,9 +1,9 @@
 
-#include "RenderingEngine.h"
+#include "VulkanEngine.h"
 
 int main()
 {
-	RenderingEngine r;
+	VulkanEngine r;
 
 	r.createWindow(800, 600, "CoreEngine VK", true);
 

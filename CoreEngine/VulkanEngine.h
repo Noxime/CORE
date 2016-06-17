@@ -6,11 +6,11 @@
 #include "Window.h"
 #include "Shared.h"
 
-class RenderingEngine
+class VulkanEngine
 {
 public:
-	RenderingEngine();
-	~RenderingEngine();
+	VulkanEngine();
+	~VulkanEngine();
 
 	Window *createWindow(uint32_t width, uint32_t height, std::string title, bool vsyncRequested); //Window create and open
 

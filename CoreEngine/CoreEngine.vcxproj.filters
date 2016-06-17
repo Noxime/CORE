@@ -18,9 +18,6 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RenderingEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Shared.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -30,11 +27,11 @@
     <ClCompile Include="WindowWin32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VulkanEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RenderingEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BUILD_OPTIONS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -45,6 +42,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

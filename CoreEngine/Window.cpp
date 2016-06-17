@@ -1,10 +1,10 @@
 #include "Window.h"
-#include "RenderingEngine.h"
+#include "VulkanEngine.h"
 #include "Shared.h"
 
 #include <assert.h>
 
-Window::Window(RenderingEngine *renderer, uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
+Window::Window(VulkanEngine *renderer, uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
 {
 	m_renderer       = renderer;
 	m_surfaceSizeX   = width;
