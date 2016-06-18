@@ -138,7 +138,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="VulkanEngine.cpp" />
+    <ClCompile Include="RenderingEngine.cpp" />
     <ClCompile Include="Shared.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WindowWin32.cpp" />
@@ -146,7 +146,7 @@
   <ItemGroup>
     <ClInclude Include="BUILD_OPTIONS.h" />
     <ClInclude Include="Platform.h" />
-    <ClInclude Include="VulkanEngine.h" />
+    <ClInclude Include="RenderingEngine.h" />
     <ClInclude Include="Shared.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

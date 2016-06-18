@@ -1,11 +1,11 @@
-#include "VulkanEngine.h"
+#include "RenderingEngine.h"
 
 
 #ifdef _WIN32
 #include <Windows.h>
 #endif
 
-VulkanEngine::VulkanEngine()
+RenderingEngine::RenderingEngine()
 {
 	setupLayersAndExtensions();
 	setupDebug();
@@ -14,14 +14,14 @@ VulkanEngine::VulkanEngine()
 	initDevice();
 }
 
-Window *VulkanEngine::createWindow(uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
+Window *RenderingEngine::createWindow(uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
 {
 	m_window = new Window(this, width, height, title, vsyncRequested);
 
 	return m_window;
 }
 
-bool VulkanEngine::run()
+bool RenderingEngine::run()
 {
 	if (m_window != nullptr)
 	{
@@ -30,38 +30,38 @@ bool VulkanEngine::run()
 	return true;
 }
 
-const VkInstance VulkanEngine::getVulkanInstance() const
+const VkInstance RenderingEngine::getVulkanInstance() const
 {
 	return m_instance;
 }
 
-const VkPhysicalDevice VulkanEngine::getVulkanPhysicalDevice() const
+const VkPhysicalDevice RenderingEngine::getVulkanPhysicalDevice() const
 {
 	return m_physicalDevice;
 }
 
-const VkDevice VulkanEngine::getVulkanDevice() const
+const VkDevice RenderingEngine::getVulkanDevice() const
 {
 	return m_device;
 }
 
-const VkQueue VulkanEngine::getVulkanQueue() const
+const VkQueue RenderingEngine::getVulkanQueue() const
 {
 	return m_queue;
 }
 
-const uint32_t VulkanEngine::getVulkanGraphicsQueueFamilyIndex() const
+const uint32_t RenderingEngine::getVulkanGraphicsQueueFamilyIndex() const
 {
 	return m_graphicsFamilyIndex;
 }
 
-const VkPhysicalDeviceProperties & VulkanEngine::getVulkanPhysicalDeviceProperties() const
+const VkPhysicalDeviceProperties &RenderingEngine::getVulkanPhysicalDeviceProperties() const
 {
 	return m_deviceProperties;
 }
 
 
-void VulkanEngine::setupLayersAndExtensions()
+void RenderingEngine::setupLayersAndExtensions()
 {
 //	m_instanceExtensions.push_back(VK_KHR_DISPLAY_EXTENSION_NAME); //Not available in most systems
 	m_instanceExtensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME); //Load extensions
@@ -70,7 +70,7 @@ void VulkanEngine::setupLayersAndExtensions()
 	m_deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME); //Enable swapchains
 }
 
-void VulkanEngine::initInstance()
+void RenderingEngine::initInstance()
 {
 	VkApplicationInfo appInfo{}; //Information about the application
 	appInfo.sType			   = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -90,7 +90,7 @@ void VulkanEngine::initInstance()
 	errorCheck(vkCreateInstance(&instanceInfo, nullptr, &m_instance)); //Create the instance
 }
 
-void VulkanEngine::initDevice()
+void RenderingEngine::initDevice()
 {
 	{
 		uint32_t deviceCount = 0; //Amount of graphic chips in the system
@@ -221,7 +221,7 @@ VulkanDebugCallback(
 }
 
 
-void VulkanEngine::setupDebug()
+void RenderingEngine::setupDebug()
 {
 	m_instanceLayers.push_back("VK_LAYER_LUNARG_standard_validation"); //Enable default validation layers
 	m_deviceLayers.push_back("VK_LAYER_LUNARG_standard_validation");
@@ -240,7 +240,7 @@ void VulkanEngine::setupDebug()
 PFN_vkCreateDebugReportCallbackEXT fvkCreateDebugReportCallbackEXT = nullptr; //Fetch the debug reprot callback extension
 PFN_vkDestroyDebugReportCallbackEXT fvkDestroyDebugReportCallbackEXT = nullptr; //Fetch the debug reprot callback extension
 
-void VulkanEngine::initDebug()
+void RenderingEngine::initDebug()
 {
 
 	fvkCreateDebugReportCallbackEXT = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(m_instance, "vkCreateDebugReportCallbackEXT"); //Get the function pointers
@@ -256,7 +256,7 @@ void VulkanEngine::initDebug()
 	fvkCreateDebugReportCallbackEXT(m_instance, &m_debugCallbackCreateInfo, nullptr, &m_debugReport);
 }
 
-void VulkanEngine::destroyDebug()
+void RenderingEngine::destroyDebug()
 {
 	fvkDestroyDebugReportCallbackEXT(m_instance, m_debugReport, nullptr);
 	m_debugReport = VK_NULL_HANDLE;
@@ -270,20 +270,20 @@ void RenderingEngine::destroyDebug() {}
 
 #endif //BUILD_ENABLE_VULKAN_DEBUG
 
-void VulkanEngine::destroyInstance()
+void RenderingEngine::destroyInstance()
 {
 	vkDestroyInstance(m_instance, nullptr);
 	m_instance = VK_NULL_HANDLE;
 }
 
-void VulkanEngine::destroyDevice()
+void RenderingEngine::destroyDevice()
 {
 	vkDestroyDevice(m_device, nullptr);
 	m_device = VK_NULL_HANDLE;
 }
 
 
-VulkanEngine::~VulkanEngine()
+RenderingEngine::~RenderingEngine()
 {
 	delete m_window; //Yeah no we dont want you
 

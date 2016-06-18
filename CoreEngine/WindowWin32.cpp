@@ -3,7 +3,7 @@
 
 #include "Window.h"
 
-#include "VulkanEngine.h"
+#include "RenderingEngine.h"
 
 #include <assert.h>
 
