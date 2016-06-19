@@ -21,6 +21,8 @@ private:
 	void updateOSWindow();
 	void initOSSurface();
 
+#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
+
 	void initSurface();
 	void destroySurface();
 
@@ -30,21 +32,28 @@ private:
 	void initSwapchainImages();
 	void destroySwapchainImages();
 
+
 	RenderingEngine *m_renderer  = nullptr; //The rendering engine, duh
 	VkSurfaceKHR     m_surface   = VK_NULL_HANDLE; //Graphgics surface
 	VkSwapchainKHR   m_swapchain = VK_NULL_HANDLE; //Swapchain
-
-	uint32_t	m_surfaceSizeX        = 512; //Width and height of the window
-	uint32_t	m_surfaceSizeY        = 512;
-	std::string m_title               = "CoreEngine"; //Title of the window
-	uint32_t    m_swapchainImageCount = 2; //How-many-buffering?
-	bool        m_vsyncRequested      = true; //Mailbox or Immediate? not guaranteed
 
 	VkSurfaceFormatKHR       m_surfaceFormat       = {}; 
 	VkSurfaceCapabilitiesKHR m_surfaceCapabilities = {}; //Name kinda says it all.
 
 	std::vector<VkImage>     m_swapchainImages;
 	std::vector<VkImageView> m_swapchainImageViews;
+
+#elif BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
+
+
+#endif
+
+
+	uint32_t	m_surfaceSizeX        = 512; //Width and height of the window
+	uint32_t	m_surfaceSizeY        = 512;
+	std::string m_title               = "CoreEngine"; //Title of the window
+	uint32_t    m_swapchainImageCount = 2; //How-many-buffering?
+	bool        m_vsyncRequested      = true; //Mailbox or Immediate? not guaranteed
 
 	bool m_windowShouldStayOpen = true; //Should this window close
 

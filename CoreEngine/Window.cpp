@@ -13,10 +13,14 @@ Window::Window(RenderingEngine *renderer, uint32_t width, uint32_t height, std::
 	m_vsyncRequested = vsyncRequested;
 
 	initOSWindow(); //Create the damn window
+#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
 	initSurface(); //And dont forget the graphics surface
 	initSwapchain();
 	initSwapchainImages();
+#endif
 }
+
+#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
 
 void Window::initSwapchain()
 {
@@ -136,6 +140,7 @@ void Window::initSwapchainImages()
 
 }
 
+#endif
 
 void Window::close()
 {
@@ -148,6 +153,8 @@ bool Window::update()
 
 	return m_windowShouldStayOpen;
 }
+
+#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
 
 void Window::destroySurface()
 {
@@ -168,10 +175,16 @@ void Window::destroySwapchainImages()
 	}
 }
 
+#elif BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
+
+#endif
+
 Window::~Window()
 {
+#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
 	destroySwapchainImages();
 	destroySwapchain();
 	destroySurface();
+#endif
 	destroyOSWindow(); //Now destroy the window
 }

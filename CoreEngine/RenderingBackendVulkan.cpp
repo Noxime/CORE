@@ -5,6 +5,8 @@
 #include <Windows.h>
 #endif
 
+#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN;
+
 RenderingEngine::RenderingEngine()
 {
 	setupLayersAndExtensions();
@@ -293,3 +295,4 @@ RenderingEngine::~RenderingEngine()
 	destroyInstance();
 }
 
+#endif

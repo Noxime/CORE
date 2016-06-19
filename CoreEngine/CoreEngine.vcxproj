@@ -138,7 +138,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="RenderingEngine.cpp" />
+    <ClCompile Include="RenderingBackendOpenGL.cpp" />
+    <ClCompile Include="RenderingBackendVulkan.cpp" />
     <ClCompile Include="Shared.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WindowWin32.cpp" />

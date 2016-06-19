@@ -110,12 +110,18 @@ void Window::updateOSWindow() //Fetch messages
 
 void Window::initOSSurface()
 {
+#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
+
 	VkWin32SurfaceCreateInfoKHR surfaceInfo {};
 	surfaceInfo.sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 	surfaceInfo.hinstance = m_win32Instance;
 	surfaceInfo.hwnd      = m_win32Window;
 
 	vkCreateWin32SurfaceKHR(m_renderer->getVulkanInstance(), &surfaceInfo, nullptr, &m_surface); //Create the graphics surface
+
+#elif BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
+
+#endif
 }
 
 #endif

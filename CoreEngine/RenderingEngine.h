@@ -16,6 +16,7 @@ public:
 
 	bool run(); //While returns true game will run. Also updates the renderer class
 
+#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
 	//Getters
 	const VkInstance                  getVulkanInstance()                 const;
 	const VkPhysicalDevice            getVulkanPhysicalDevice()           const;
@@ -23,8 +24,14 @@ public:
 	const VkQueue                     getVulkanQueue()                    const;
 	const uint32_t                    getVulkanGraphicsQueueFamilyIndex() const;
 	const VkPhysicalDeviceProperties &getVulkanPhysicalDeviceProperties() const;
+#elif BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
+
+#endif
 
 private:
+	
+#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
+
 	void setupLayersAndExtensions();
 
 	void initInstance();
@@ -38,7 +45,6 @@ private:
 	void initDebug();
 	void destroyDebug();
 
-
 	VkInstance				   m_instance		  = VK_NULL_HANDLE; //Vulkan instance
 	VkPhysicalDevice		   m_physicalDevice   = VK_NULL_HANDLE; //Physical device
 	VkDevice				   m_device			  = VK_NULL_HANDLE; //Logical device
@@ -46,8 +52,6 @@ private:
 	VkPhysicalDeviceProperties m_deviceProperties = {}; //Properties for physical device
 
 	uint32_t m_graphicsFamilyIndex	              = 0;
-
-	Window *m_window                              = nullptr;
 
 	std::vector<const char*> m_instanceLayers;     //List of instance debugging layers
 	std::vector<const char*> m_instanceExtensions; //List of instance extensions
@@ -57,4 +61,13 @@ private:
 	VkDebugReportCallbackEXT		   m_debugReport			 = VK_NULL_HANDLE;
 	VkDebugReportCallbackCreateInfoEXT m_debugCallbackCreateInfo = {}; //Create callback info
 
+#elif BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
+
+	void setupContext();
+
+	void destroyContext();
+
+#endif
+
+	Window *m_window                              = nullptr;
 };
