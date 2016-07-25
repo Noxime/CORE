@@ -1,3 +1,10 @@
+/*
+Core engine
+
+Aaro Perämaa
+2016
+*/
+
 #include "BUILD_OPTIONS.h"
 #include "Platform.h"
 
@@ -37,7 +44,7 @@ void Window::initOSWindow()
 	WNDCLASSEX winClass{};
 	assert(m_surfaceSizeX > 0);
 	assert(m_surfaceSizeY > 0);
-
+	
 	m_win32Instance = GetModuleHandle(nullptr);
 	m_win32ClassName = m_title + "_" + std::to_string(m_win32ClassIdCounter);
 	m_win32ClassIdCounter++;

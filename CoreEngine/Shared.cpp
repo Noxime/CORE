@@ -1,3 +1,10 @@
+/*
+Core engine
+
+Aaro Perämaa
+2016
+*/
+
 #include "BUILD_OPTIONS.h"
 #include "Shared.h"
 

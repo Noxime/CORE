@@ -16,7 +16,7 @@ public:
 
 	bool run(); //While returns true game will run. Also updates the renderer class
 
-#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
+
 	//Getters
 	const VkInstance                  getVulkanInstance()                 const;
 	const VkPhysicalDevice            getVulkanPhysicalDevice()           const;
@@ -24,13 +24,9 @@ public:
 	const VkQueue                     getVulkanQueue()                    const;
 	const uint32_t                    getVulkanGraphicsQueueFamilyIndex() const;
 	const VkPhysicalDeviceProperties &getVulkanPhysicalDeviceProperties() const;
-#elif BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
 
-#endif
 
 private:
-	
-#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
 
 	void setupLayersAndExtensions();
 
@@ -61,13 +57,6 @@ private:
 	VkDebugReportCallbackEXT		   m_debugReport			 = VK_NULL_HANDLE;
 	VkDebugReportCallbackCreateInfoEXT m_debugCallbackCreateInfo = {}; //Create callback info
 
-#elif BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
-
-	void setupContext();
-
-	void destroyContext();
-
-#endif
 
 	Window *m_window                              = nullptr;
 };

@@ -1,3 +1,10 @@
+/*
+Core engine
+
+Aaro Perämaa
+2016
+*/
+
 #pragma once
 
 #include "Platform.h"

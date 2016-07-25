@@ -1,3 +1,10 @@
+/*
+Core engine
+
+Aaro Perämaa
+2016
+*/
+
 #pragma once
 
 #define BUILD_ENABLE_VULKAN_DEBUG			1 //Debug messages

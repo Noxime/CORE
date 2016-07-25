@@ -1,3 +1,10 @@
+/*
+Core engine
+
+Aaro Perämaa
+2016
+*/
+
 #include "Window.h"
 #include "RenderingEngine.h"
 #include "Shared.h"
@@ -17,6 +24,8 @@ Window::Window(RenderingEngine *renderer, uint32_t width, uint32_t height, std::
 	initSurface(); //And dont forget the graphics surface
 	initSwapchain();
 	initSwapchainImages();
+#elif BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
+	initOSSurface();
 #endif
 }
 
