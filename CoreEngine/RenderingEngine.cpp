@@ -18,6 +18,7 @@ bool RenderingEngine::run()
 {
 	if (m_window != nullptr)
 	{
+		clearCurrentBuffer();
 		return m_window->update();
 	}
 	return true;

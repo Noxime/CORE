@@ -13,13 +13,27 @@ Aaro Perämaa
 #endif
 
 
-#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL;
+#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
 
 RenderingEngine::RenderingEngine()
 {
 
 }
 
+void RenderingEngine::initInstance()
+{
+	
+}
+
+void RenderingEngine::clearCurrentBuffer()
+{
+
+}
+
+void RenderingEngine::destroyInstance()
+{
+
+}
 
 
 RenderingEngine::~RenderingEngine()
