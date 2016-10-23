@@ -10,7 +10,7 @@ class RenderingEngine;
 class Window
 {
 public:
-	Window(RenderingEngine *renderer, uint32_t width, uint32_t height, std::string title, bool requestedVsync);
+	Window(uint32_t width, uint32_t height, std::string title, bool requestedVsync);
 	~Window();
 
 	void close(); //Close the window dude, someone is watching your screen over your shoulder
@@ -25,16 +25,6 @@ public:
 
 private:
 
-	void initSurface();
-	void destroySurface();
-
-	void initSwapchain();
-	void destroySwapchain();
-
-	void initSwapchainImages();
-	void destroySwapchainImages();
-
-	RenderingEngine *m_renderer			    = nullptr; //The rendering engine, duh
 	uint32_t	     m_surfaceSizeX         = 512; //Width and height of the window
 	uint32_t	     m_surfaceSizeY         = 512;
 	std::string		 m_title                = "CoreEngine"; //Title of the window

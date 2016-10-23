@@ -146,13 +146,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="FileIO.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshRender.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="RenderingBackendOpenGL.cpp" />
     <ClCompile Include="RenderingBackendVulkan.cpp" />
     <ClCompile Include="RenderingEngine.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Vector2f.cpp" />
     <ClCompile Include="Vector3f.cpp" />
@@ -162,11 +165,14 @@
   <ItemGroup>
     <ClInclude Include="BUILD_OPTIONS.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="FileIO.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshRender.h" />
     <ClInclude Include="Platform.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="RenderingEngine.h" />
+    <ClInclude Include="Shader.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Vector2f.h" />
     <ClInclude Include="Vector3f.h" />
