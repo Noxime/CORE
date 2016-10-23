@@ -27,6 +27,7 @@ public:
 	std::vector<VkImage>     m_scImages;                 //Swapchain images
 	VkFormat                 m_scFormat;                 //Swapchain image format
 	VkExtent2D               m_scExtent;                 //Swapchain size
+	std::vector<VkImageView> m_scImageViews;             //We see the images through these
 
 private:
 
@@ -40,6 +41,7 @@ private:
 	void initPhysicalDevice();
 	void initDevice();
 	void initSwapchain();
+	void initImageViews();
 
 
 	Window *m_window                              = nullptr;

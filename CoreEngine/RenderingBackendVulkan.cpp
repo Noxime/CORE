@@ -22,6 +22,7 @@ RenderingEngine::RenderingEngine(uint32_t width, uint32_t height, std::string ti
 	initPhysicalDevice();
 	initDevice();
 	initSwapchain();
+	initImageViews();
 
 	std::cout << "VK: Init complete" << std::endl;
 }
@@ -635,13 +636,40 @@ void RenderingEngine::initSwapchain()
 
 }
 
+void RenderingEngine::initImageViews()
+{
+	m_scImageViews.resize(m_scImages.size(), VkImageView());
+
+	for (uint32_t i = 0; i < m_scImages.size(); i++) {
+		VkImageViewCreateInfo createInfo = {};
+		createInfo.sType                 = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		createInfo.image                 = m_scImages[i];
+		createInfo.viewType              = VK_IMAGE_VIEW_TYPE_2D;
+		createInfo.format                = m_scFormat;
+
+		// Color swizzle
+		createInfo.components.r          = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.g          = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.b          = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.a          = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+		createInfo.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT; //Color images
+		createInfo.subresourceRange.baseMipLevel   = 0;
+		createInfo.subresourceRange.levelCount     = 1; //No mip mapping
+		createInfo.subresourceRange.baseArrayLayer = 0;
+		createInfo.subresourceRange.layerCount     = 1; //More VR compatibility
+
+		if (vkCreateImageView(m_device, &createInfo, nullptr, &m_scImageViews[i]) != VK_SUCCESS) {
+			std::cout << "VK: Failed to create image views!";
+		}
+	}
+
+}
+
 
 Window *RenderingEngine::createWindow(uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
 {
 	m_window = new Window(this, width, height, title, vsyncRequested);
-
-	// SURFACE
-	
 
 	return m_window;
 }
@@ -656,6 +684,11 @@ void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT
 
 RenderingEngine::~RenderingEngine()
 {
+	for each (auto imageView in m_scImageViews)
+	{
+		vkDestroyImageView(m_device, imageView, nullptr);
+	}
+
 	vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
 	vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
 	vkDestroyDevice(m_device, nullptr);
