@@ -23,6 +23,10 @@ public:
 	VkQueue                  m_graphicsQueue;            //Where we submit the calls
 	VkQueue                  m_presentQueue;             //We need to present the images
 	VkSurfaceKHR             m_surface;                  //Rendering surface
+	VkSwapchainKHR           m_swapchain;                //Framebuffer
+	std::vector<VkImage>     m_scImages;                 //Swapchain images
+	VkFormat                 m_scFormat;                 //Swapchain image format
+	VkExtent2D               m_scExtent;                 //Swapchain size
 
 private:
 
@@ -35,6 +39,7 @@ private:
 	void initSurface();
 	void initPhysicalDevice();
 	void initDevice();
+	void initSwapchain();
 
 
 	Window *m_window                              = nullptr;

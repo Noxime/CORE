@@ -14,5 +14,6 @@ Aaro Perämaa
 #include <sstream>
 #include <string>
 #include <set>
+#include <algorithm>
 
 #include <vulkan/vulkan.h> //Should be only vulkan include in the whole program

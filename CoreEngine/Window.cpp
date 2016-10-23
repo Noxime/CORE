@@ -61,6 +61,11 @@ uint32_t Window::getHeight()
 	return m_surfaceSizeY;
 }
 
+bool Window::getVSync()
+{
+	return m_vsyncRequested;
+}
+
 void Window::destroySurface()
 {
 

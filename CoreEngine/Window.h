@@ -18,7 +18,7 @@ public:
 
 	uint32_t getWidth();
 	uint32_t getHeight();
-
+	bool     getVSync();
 
 	GLFWwindow* m_window;
 
