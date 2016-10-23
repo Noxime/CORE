@@ -3,6 +3,8 @@
 #include "Platform.h"
 #include <vector>
 
+#include <GLFW\glfw3.h>
+
 class RenderingEngine;
 
 class Window
@@ -16,6 +18,10 @@ public:
 
 	uint32_t getWidth();
 	uint32_t getHeight();
+
+
+	GLFWwindow* m_window;
+
 
 private:
 

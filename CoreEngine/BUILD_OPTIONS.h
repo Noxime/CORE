@@ -7,8 +7,7 @@ Aaro Perämaa
 
 #pragma once
 
-#define BUILD_ENABLE_VULKAN_DEBUG			1 //Debug messages
-#define BUILD_ENABLE_VULKAN_RUNTIME_DEBUG   1 //Runtime vulkan error 
+#define BUILD_ENABLE_VULKAN_DEBUG         //Debug messages
 
 #define RENDERING_BACKEND_VULKAN 0
 #define RENDERING_BACKEND_OPENGL 1

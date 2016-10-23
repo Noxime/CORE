@@ -12,9 +12,7 @@ Aaro Perämaa
 int main()
 {
 
-	RenderingEngine r;
-
-	r.createWindow(800, 600, "CoreEngine VK", false);
+	RenderingEngine r(800, 600, "CoreEngine VK", false);
 
 	uint64_t frameCounter = 0;
 	clock_t nextTime = clock() + CLOCKS_PER_SEC;

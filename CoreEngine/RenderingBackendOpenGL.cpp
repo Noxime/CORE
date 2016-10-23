@@ -8,31 +8,25 @@ Aaro Perämaa
 #include "RenderingEngine.h"
 
 
-#ifdef _WIN32
-#include <Windows.h>
-#endif
-
-
 #if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
 
-RenderingEngine::RenderingEngine()
+RenderingEngine::RenderingEngine(uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
 {
-
+	glfwInit();
+	createWindow(width, height, title, vsyncRequested);
 }
 
-void RenderingEngine::initInstance()
+Window *RenderingEngine::createWindow(uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
 {
-	
+	m_window = new Window(this, width, height, title, vsyncRequested);
+
+	return m_window;
 }
+
 
 void RenderingEngine::clearCurrentBuffer()
 {
-
-}
-
-void RenderingEngine::destroyInstance()
-{
-
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 

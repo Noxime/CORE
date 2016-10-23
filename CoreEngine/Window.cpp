@@ -10,9 +10,21 @@ Aaro Perämaa
 
 #include <assert.h>
 
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
 Window::Window(RenderingEngine *renderer, uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
 {
+	m_surfaceSizeX = width;
+	m_surfaceSizeY = height;
+	m_renderer     = renderer;
 
+#ifdef BUILD_ENABLE_VULKAN_DEBUG
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); //Dont create a gl context
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);   //Dont resize
+#endif
+
+	m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 }
 
 void Window::initSwapchain()
@@ -23,7 +35,7 @@ void Window::initSwapchain()
 
 void Window::initSurface()
 {
-	
+
 }
 
 void Window::initSwapchainImages()
@@ -31,14 +43,12 @@ void Window::initSwapchainImages()
 	
 }
 
-void Window::close()
-{
-	m_windowShouldStayOpen = false; //Well we shouldnt 
-}
-
 bool Window::update()
 {
-	return m_windowShouldStayOpen;
+	glfwPollEvents();
+
+
+	return !glfwWindowShouldClose(m_window);
 }
 
 uint32_t Window::getWidth()
@@ -70,5 +80,5 @@ void Window::destroySwapchainImages()
 
 Window::~Window()
 {
-
+	
 }
