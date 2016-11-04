@@ -17,6 +17,7 @@ Aaro Perämaa
 #include <algorithm>
 #include <fstream>
 #include <map>
-#include <thread>
+#include <future>
+#include <array>
 
 #include <vulkan/vulkan.h> //Should be only vulkan include in the whole program

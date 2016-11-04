@@ -5,6 +5,7 @@
 #include "Platform.h"
 #include "Window.h"
 #include "FileIO.h"
+#include "Vertex.h"
 
 class RenderingEngine
 {
@@ -37,6 +38,17 @@ public:
 	VkSemaphore                                           m_imageAvailableSemaphore;  //We have got the image and were ready to render
 	VkSemaphore                                           m_renderFinishedSemaphore;  //We have got the render and were ready to present
 
+	VkBuffer m_vertexBuffer;
+	VkDeviceMemory m_vertexMemory;
+
+	std::vector<Vertex> vertices = {
+		Vertex(Vector3f( 0, 0, 0), Vector2f( 0, 0), Vector2f( 0, 0), Vector3f( 0, 0, 1), Vector3f( 1, 0, 0)),
+		Vertex(Vector3f( 1, 1, 0), Vector2f( 0, 0), Vector2f( 0, 0), Vector3f( 0, 0, 1), Vector3f( 1, 0, 0)),
+		Vertex(Vector3f( 0, 1, 0), Vector2f( 0, 0), Vector2f( 0, 0), Vector3f( 0, 0, 1), Vector3f( 1, 0, 0)),
+	};
+
+
+
 private:
 
 	Window *createWindow(uint32_t width, uint32_t height, std::string title, bool vsyncRequested); //Window create and open
@@ -57,8 +69,12 @@ private:
 	void initPipeline();
 	void initFramebuffers();
 	void initCommandPool();
+
+	void initVertexBuffer();
+
 	void initCommandBuffers();
 	void initSemaphores();
+
 
 
 	Window *m_window                              = nullptr;

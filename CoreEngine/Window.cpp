@@ -13,18 +13,21 @@ Aaro Perämaa
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-Window::Window(uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
+
+Window::Window(RenderingEngine *renderer, uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
 {
 	m_surfaceSizeX = width;
 	m_surfaceSizeY = height;
 
-#ifdef BUILD_ENABLE_VULKAN_DEBUG
+
+#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); //Dont create a gl context
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);   //Dont resize
+	glfwWindowHint(GLFW_RESIZABLE,  GLFW_FALSE);
 #endif
 
 	m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 }
+
 
 
 bool Window::update()

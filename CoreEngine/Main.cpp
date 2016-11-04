@@ -6,9 +6,7 @@ Aaro Perämaa
 */
 
 #include "RenderingEngine.h"
-#include "MeshRender.h"
 #include "Mesh.h"
-#include "Shader.h"
 #include "FileIO.h"
 
 #include <ctime>
@@ -29,7 +27,7 @@ int main()
 	uint32_t i[] = { 0, 1, 2,
 					 2, 3, 1, };
 
-	MeshRender m(Mesh(v, i), Shader(FileIO::loadFile("../resources/shaders/vert.spv"), FileIO::loadFile("../resources/shaders/frag.spv"), &r), &r);
+	Mesh(v, i);
 
 
 	uint64_t frameCounter = 0;
@@ -47,5 +45,6 @@ int main()
 		frameCounter++;
 	}
 
+	
 	return 0;
 }
