@@ -6,6 +6,7 @@ std::vector<char> FileIO::loadFile(std::string path)
 
 	if (!file.is_open()) {
 		std::cout << "IO: Failed to open file: " << path << std::endl;
+		return std::vector<char>();
 	}
 
 	size_t fileSize = (size_t)file.tellg();

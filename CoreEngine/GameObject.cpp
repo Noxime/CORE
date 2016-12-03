@@ -2,8 +2,11 @@
 
 
 
-GameObject::GameObject()
+
+
+GameObject::GameObject(Transform transform)
 {
+	m_transform = transform;
 }
 
 
@@ -23,7 +26,3 @@ bool GameObject::isEnabled()
 	return m_enabled;
 }
 
-void GameObject::addComponent(Component component)
-{
-	m_components.push_back(component);
-}

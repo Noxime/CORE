@@ -1,23 +1,25 @@
 #pragma once
 #include "Vector3f.h"
 #include "Transform.h"
-#include "Component.h"
+#include "MeshRenderer.h"
 
-#include <vector>
+#include "Platform.h"
 
 class GameObject
 {
 public:
 	GameObject();
+	GameObject(Transform transform);
 	~GameObject();
 
 	void setEnabled(bool enabled);
 	bool isEnabled();
 
-	void addComponent(Component component);
+	//void setRenderer(MeshRenderer renderer);
+
 private:
 	bool m_enabled = true;
 	Transform m_transform;
-	std::vector<Component> m_components;
+	//MeshRenderer m_renderer;
 };
 

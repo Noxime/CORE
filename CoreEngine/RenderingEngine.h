@@ -6,6 +6,7 @@
 #include "Window.h"
 #include "FileIO.h"
 #include "Vertex.h"
+#include "GameObject.h"
 
 class RenderingEngine
 {
@@ -15,7 +16,7 @@ public:
 
 
 	bool run(); //While returns true game will run. Also updates the renderer class
-
+	uint32_t makeShader(std::vector<char> vert, std::vector<char> frag);
 
 	VkInstance                                            m_instance;                 //Vulkan instance
 	VkDebugReportCallbackEXT                              m_callback;                 //Debug callback
@@ -42,7 +43,7 @@ public:
 	VkDeviceMemory m_vertexMemory;
 
 	std::vector<Vertex> vertices = {
-		Vertex(Vector3f( 0, 0, 0), Vector2f( 0, 0), Vector2f( 0, 0), Vector3f( 0, 0, 1), Vector3f( 1, 0, 0)),
+		Vertex(Vector3f( -1, 0, 0), Vector2f( 0, 0), Vector2f( 0, 0), Vector3f( 0, 0, 1), Vector3f( 1, 0, 0)),
 		Vertex(Vector3f( 1, 1, 0), Vector2f( 0, 0), Vector2f( 0, 0), Vector3f( 0, 0, 1), Vector3f( 1, 0, 0)),
 		Vertex(Vector3f( 0, 1, 0), Vector2f( 0, 0), Vector2f( 0, 0), Vector3f( 0, 0, 1), Vector3f( 1, 0, 0)),
 	};

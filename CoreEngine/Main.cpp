@@ -8,8 +8,11 @@ Aaro Perämaa
 #include "RenderingEngine.h"
 #include "Mesh.h"
 #include "FileIO.h"
+#include "MeshRenderer.h"
+#include "Shader.h"
 
 #include <ctime>
+#include "Main.h"
 
 
 int main()
@@ -27,8 +30,7 @@ int main()
 	uint32_t i[] = { 0, 1, 2,
 					 2, 3, 1, };
 
-	Mesh(v, i);
-
+	Shader s = Shader(r.makeShader(FileIO::loadFile("../Resources/Shaders/vert.spv"), FileIO::loadFile("../Resources/Shaders/frag.spv")));
 
 	uint64_t frameCounter = 0;
 	clock_t nextTime = clock() + CLOCKS_PER_SEC;

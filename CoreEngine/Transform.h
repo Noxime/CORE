@@ -1,9 +1,8 @@
 #pragma once
 #include "Vector3f.h"
 #include "Quaternion.h"
-#include "Component.h"
 
-class Transform: Component
+class Transform
 {
 public:
 	Transform();

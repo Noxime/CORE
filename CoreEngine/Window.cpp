@@ -14,7 +14,7 @@ Aaro Perämaa
 #include <GLFW/glfw3.h>
 
 
-Window::Window(RenderingEngine *renderer, uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
+Window::Window(uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
 {
 	m_surfaceSizeX = width;
 	m_surfaceSizeY = height;

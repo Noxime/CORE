@@ -16,6 +16,8 @@ public:
 	void setZ(float z);
 	void setW(float w);
 
+	static Quaternion identity();
+
 private:
 	float m_x;
 	float m_y;

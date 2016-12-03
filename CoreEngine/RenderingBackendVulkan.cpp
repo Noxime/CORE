@@ -9,6 +9,171 @@ Aaro Perämaa
 
 #if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
 
+uint32_t RenderingEngine::makeShader(std::vector<char> vert, std::vector<char> frag)
+{
+	VkShaderModule vertModule;
+	VkShaderModule fragModule;
+
+	VkShaderModuleCreateInfo vertCreateInfo = {};
+	vertCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	vertCreateInfo.codeSize = vert.size();
+	vertCreateInfo.pCode = (uint32_t*)vert.data();
+
+	if (vkCreateShaderModule(m_device, &vertCreateInfo, nullptr, &vertModule) != VK_SUCCESS) {
+		std::cout << "VK: Failed to create vertex shader module!" << std::endl;
+	}
+
+	VkShaderModuleCreateInfo fragCreateInfo = {};
+	fragCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	fragCreateInfo.codeSize = frag.size();
+	fragCreateInfo.pCode = (uint32_t*)frag.data();
+
+	if (vkCreateShaderModule(m_device, &fragCreateInfo, nullptr, &fragModule) != VK_SUCCESS) {
+		std::cout << "VK: Failed to create fragment shader module!" << std::endl;
+	}
+
+
+
+	VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
+	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+	vertShaderStageInfo.module = vertModule;
+	vertShaderStageInfo.pName = "main";
+
+	VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
+	fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+	fragShaderStageInfo.module = fragModule;
+	fragShaderStageInfo.pName = "main";
+
+
+	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
+
+
+	VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
+	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	vertexInputInfo.vertexBindingDescriptionCount = 0;
+	vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
+	vertexInputInfo.vertexAttributeDescriptionCount = 0;
+	vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+
+	auto bindingDescription = Vertex::getBindingDescription();
+	auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.vertexAttributeDescriptionCount = attributeDescriptions.size();
+	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+
+
+
+	VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
+	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	inputAssembly.primitiveRestartEnable = VK_FALSE;
+
+	VkViewport viewport = {};
+	viewport.x = 0.0f;
+	viewport.y = 0.0f;
+	viewport.width = (float)m_scExtent.width;
+	viewport.height = (float)m_scExtent.height;
+	viewport.minDepth = 0.0f;
+	viewport.maxDepth = 1.0f;
+
+	VkRect2D scissor = {};
+	scissor.offset = { 0, 0 };
+	scissor.extent = m_scExtent;
+
+	VkPipelineViewportStateCreateInfo viewportState = {};
+	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	viewportState.viewportCount = 1;
+	viewportState.pViewports = &viewport;
+	viewportState.scissorCount = 1;
+	viewportState.pScissors = &scissor;
+
+	VkPipelineRasterizationStateCreateInfo rasterizer = {};
+	rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+	rasterizer.depthClampEnable = VK_FALSE; //Could be useful for shadowmaps
+	rasterizer.rasterizerDiscardEnable = VK_FALSE; //This disables the rasterizer
+
+	rasterizer.polygonMode = VK_POLYGON_MODE_FILL; //Triangle mode
+	rasterizer.lineWidth = 1.0f;
+
+	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;   //Backface culling
+	rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE; //Triangles are clockwise
+
+	rasterizer.depthBiasEnable = VK_FALSE; //Could be used for shadow mapping
+
+	VkPipelineMultisampleStateCreateInfo multisampling = {};
+	multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+	multisampling.sampleShadingEnable = VK_FALSE;
+	multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+	multisampling.minSampleShading = 1.0f; // Optional
+	multisampling.pSampleMask = nullptr; /// Optional
+	multisampling.alphaToCoverageEnable = VK_FALSE; // Optional
+	multisampling.alphaToOneEnable = VK_FALSE; // Optional
+
+	VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
+	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+	colorBlendAttachment.blendEnable = VK_FALSE;
+	colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
+	colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
+	colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD; // Optional
+	colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
+	colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
+	colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
+
+	VkPipelineColorBlendStateCreateInfo colorBlending = {};
+	colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+	colorBlending.logicOpEnable = VK_FALSE;
+	colorBlending.logicOp = VK_LOGIC_OP_COPY; // Optional
+	colorBlending.attachmentCount = 1;
+	colorBlending.pAttachments = &colorBlendAttachment;
+	colorBlending.blendConstants[0] = 0.0f; // Optional
+	colorBlending.blendConstants[1] = 0.0f; // Optional
+	colorBlending.blendConstants[2] = 0.0f; // Optional
+	colorBlending.blendConstants[3] = 0.0f; // Optional
+
+	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
+	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutInfo.setLayoutCount = 0; // Optional
+	pipelineLayoutInfo.pSetLayouts = nullptr; // Optional
+	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
+	pipelineLayoutInfo.pPushConstantRanges = 0; // Optional
+
+	if (vkCreatePipelineLayout(m_device, &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
+		std::cout << "VK: Failed to create pipeline layout!" << std::endl;
+	}
+
+
+	VkGraphicsPipelineCreateInfo pipelineInfo = {};
+	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	pipelineInfo.stageCount = 2;
+	pipelineInfo.pStages = shaderStages;
+	pipelineInfo.pVertexInputState = &vertexInputInfo;
+	pipelineInfo.pInputAssemblyState = &inputAssembly;
+	pipelineInfo.pViewportState = &viewportState;
+	pipelineInfo.pRasterizationState = &rasterizer;
+	pipelineInfo.pMultisampleState = &multisampling;
+	pipelineInfo.pDepthStencilState = nullptr; // Optional
+	pipelineInfo.pColorBlendState = &colorBlending;
+	pipelineInfo.pDynamicState = nullptr; // Optional
+	pipelineInfo.layout = m_pipelineLayout;
+	pipelineInfo.renderPass = m_renderpass;
+	pipelineInfo.subpass = 0;
+	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+	pipelineInfo.basePipelineIndex = -1; // Optional
+
+	if (vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_pipeline) != VK_SUCCESS) {
+		std::cout << "VK: Failed to create graphics pipeline!" << std::endl;
+	}
+
+	vkDestroyShaderModule(m_device, vertModule, nullptr);
+	vkDestroyShaderModule(m_device, fragModule, nullptr);
+
+	return 0;
+}
+
 void initVertexBuffer();
 
 RenderingEngine::RenderingEngine(uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
@@ -282,6 +447,7 @@ uint32_t findMemoryType(VkPhysicalDevice pDevice, uint32_t typeFilter, VkMemoryP
 
 
 	std::cout << "VK: Failed to find suitable memory type!" << std::endl;
+	return 0;
 }
 
 
@@ -926,8 +1092,11 @@ void RenderingEngine::reRecordCmdBuf()
 {
 	for (size_t i = 0; i < m_commandBuffers.size(); i++) {
 		
+#ifdef MULTITHREAD
 		std::future<void> thread = std::async(threadedCmdRecord, m_commandBuffers[i], m_renderpass, m_framebuffers[i], m_scExtent, m_pipeline, m_vertexBuffer, vertices);
-		//threadedCmdRecord(m_commandBuffers[i], m_renderpass, m_framebuffers[i], m_scExtent, m_pipeline);
+#else
+		threadedCmdRecord(m_commandBuffers[i], m_renderpass, m_framebuffers[i], m_scExtent, m_pipeline, m_vertexBuffer, vertices);
+#endif
 	}
 
 }
@@ -979,7 +1148,7 @@ void RenderingEngine::drawFrame()
 
 Window *RenderingEngine::createWindow(uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
 {
-	m_window = new Window(this, width, height, title, vsyncRequested);
+	m_window = new Window(width, height, title, vsyncRequested);
 
 	return m_window;
 }

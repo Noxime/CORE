@@ -10,7 +10,7 @@ class RenderingEngine;
 class Window
 {
 public:
-	Window(RenderingEngine *renderer, uint32_t width, uint32_t height, std::string title, bool requestedVsync);
+	Window(uint32_t width, uint32_t height, std::string title, bool requestedVsync);
 	~Window();
 
 	void close(); //Close the window dude, someone is watching your screen over your shoulder

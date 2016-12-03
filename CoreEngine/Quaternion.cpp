@@ -58,3 +58,8 @@ void Quaternion::setW(float w)
 {
 	m_w = w;
 }
+
+Quaternion Quaternion::identity()
+{
+	return Quaternion(0, 0, 0, 1);
+}
