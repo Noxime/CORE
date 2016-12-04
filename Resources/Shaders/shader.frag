@@ -11,6 +11,5 @@ layout(location = 4) in vec3 fTangent;
 layout(location = 0) out vec4 outColor;
 
 void main() {
-    
-	outColor = vec4(1, 1, 1, 1);
+	outColor = vec4(0, 1, 0, 1);
 }

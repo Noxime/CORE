@@ -12,14 +12,12 @@ Aaro Perämaa
 #include "Shader.h"
 
 #include <ctime>
-#include "Main.h"
 
 
 int main()
 {
 
-	//RenderingEngine.init(800, 600, "CoreEngine VK", false);
-	RenderingEngine r(800, 600, "CoreEngine VK", false);
+	RenderingEngine r(800, 600, "CoreEngine VK", true);
 
 
 	Vertex v[] = { Vertex( Vector3f(-1, 0, 0), Vector2f(0, 0), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)),
@@ -29,8 +27,13 @@ int main()
 
 	uint32_t i[] = { 0, 1, 2,
 					 2, 3, 1, };
+#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
+	Shader s = Shader(r.makeShader(FileIO::loadAsciiFile("../Resources/Shaders/shader.vert"), FileIO::loadAsciiFile("../Resources/Shaders/shader.frag")));
+#else
+	Shader s = Shader(r.makeShader(FileIO::loadBinaryFile("../Resources/Shaders/vert.spv"), FileIO::loadBinaryFile("../Resources/Shaders/frag.spv")));
+#endif
 
-	Shader s = Shader(r.makeShader(FileIO::loadFile("../Resources/Shaders/vert.spv"), FileIO::loadFile("../Resources/Shaders/frag.spv")));
+	r.useShader(s.getId());
 
 	uint64_t frameCounter = 0;
 	clock_t nextTime = clock() + CLOCKS_PER_SEC;

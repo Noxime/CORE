@@ -19,13 +19,23 @@ Window::Window(uint32_t width, uint32_t height, std::string title, bool vsyncReq
 	m_surfaceSizeX = width;
 	m_surfaceSizeY = height;
 
+	glfwInit();
 
 #if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); //Dont create a gl context
 	glfwWindowHint(GLFW_RESIZABLE,  GLFW_FALSE);
+#else
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 #endif
 
+
 	m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+
+	glfwSwapInterval(vsyncRequested);
+
+#if BUILD_WITH_RENDERING_BACKEND
+	glfwMakeContextCurrent(m_window);
+#endif
 }
 
 
@@ -33,8 +43,16 @@ Window::Window(uint32_t width, uint32_t height, std::string title, bool vsyncReq
 bool Window::update()
 {
 	glfwPollEvents();
+	glfwSwapBuffers(m_window);
+	
+	int width, height;
 
+	glfwGetWindowSize(m_window, &width, &height);
 
+#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
+	glViewport(0, 0, width, height);
+#endif
+	
 	return !glfwWindowShouldClose(m_window);
 }
 
@@ -55,5 +73,6 @@ bool Window::getVSync()
 
 Window::~Window()
 {
-	
+	glfwDestroyWindow(m_window);
+	glfwTerminate();
 }

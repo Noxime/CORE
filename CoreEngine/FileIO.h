@@ -6,8 +6,9 @@ class FileIO
 {
 public:
 
-	static std::vector<char> loadFile(std::string path);
+	static std::vector<char> loadBinaryFile(std::string path);
 
+	static std::vector<char> loadAsciiFile(std::string path);
 
 };
 

@@ -14,14 +14,14 @@ layout(location = 3) out vec3 fNormal;
 layout(location = 4) out vec3 fTangent;
 
 out gl_PerVertex {
-    vec4 gl_Position;
+	vec4 gl_Position;
 };
 
 void main() {
     gl_Position = vec4(position, 1.0);
 	
 	fPosition  = position;
-    fTexcoord0 = texcoord0;
+	fTexcoord0 = texcoord0;
 	fTexcoord1 = texcoord1;
 	fNormal    = normal;
 	fTangent   = tangent;

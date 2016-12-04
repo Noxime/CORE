@@ -69,32 +69,32 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\VulkanSDK\1.0.3.1\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.0.3.1\Bin32;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\VulkanSDK\1.0.3.1\Include;C:\Users\Aarop\libraries\glew-2.0.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.0.3.1\Bin32;C:\Users\Aarop\libraries\glew-2.0.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\VulkanSDK\1.0.3.1\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.0.3.1\Bin32;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\VulkanSDK\1.0.3.1\Include;C:\Users\Aarop\libraries\glew-2.0.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.0.3.1\Bin32;C:\Users\Aarop\libraries\glew-2.0.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\VulkanSDK\1.0.3.1\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.0.3.1\Bin;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\VulkanSDK\1.0.3.1\Include;C:\Users\Aarop\libraries\glew-2.0.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.0.3.1\Bin32;C:\Users\Aarop\libraries\glew-2.0.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\VulkanSDK\1.0.3.1\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.0.3.1\Bin;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\VulkanSDK\1.0.3.1\Include;C:\Users\Aarop\libraries\glew-2.0.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.0.3.1\Bin32;C:\Users\Aarop\libraries\glew-2.0.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\include;C:\VulkanSDK\1.0.21.0\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\include;C:\VulkanSDK\1.0.21.0\Include;C:\Users\Aarop\libraries\glew-2.0.0\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>vulkan-1.lib;opengl32.lib;glu32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\VulkanSDK\1.0.21.0\Bin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glu32.lib;glfw3.lib;glew32.lib;glew32s.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\VulkanSDK\1.0.21.0\Bin32;C:\Users\Aarop\libraries\glew-2.0.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -102,12 +102,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\include;C:\VulkanSDK\1.0.21.0\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\include;C:\VulkanSDK\1.0.21.0\Include;C:\Users\Aarop\libraries\glew-2.0.0\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>vulkan-1.lib;opengl32.lib;glu32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\VulkanSDK\1.0.21.0\Bin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glu32.lib;glfw3.lib;glew32.lib;glew32s.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\VulkanSDK\1.0.21.0\Bin32;C:\Users\Aarop\libraries\glew-2.0.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -117,14 +117,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\include;C:\VulkanSDK\1.0.21.0\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\include;C:\VulkanSDK\1.0.21.0\Include;C:\Users\Aarop\libraries\glew-2.0.0\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>vulkan-1.lib;opengl32.lib;glu32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\VulkanSDK\1.0.21.0\Bin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glu32.lib;glfw3.lib;glew32.lib;glew32s.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\VulkanSDK\1.0.21.0\Bin32;C:\Users\Aarop\libraries\glew-2.0.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -134,14 +134,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\include;C:\VulkanSDK\1.0.21.0\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\include;C:\VulkanSDK\1.0.21.0\Include;C:\Users\Aarop\libraries\glew-2.0.0\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>vulkan-1.lib;opengl32.lib;glu32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\VulkanSDK\1.0.21.0\Bin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glu32.lib;glfw3.lib;glew32.lib;glew32s.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Aarop\libraries\glfw-3.2.1.bin.WIN32\lib-vc2015;C:\VulkanSDK\1.0.21.0\Bin32;C:\Users\Aarop\libraries\glew-2.0.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -156,6 +156,7 @@
     <ClCompile Include="RenderingEngine.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="Util.cpp" />
     <ClCompile Include="Vector2f.cpp" />
     <ClCompile Include="Vector3f.cpp" />
     <ClCompile Include="Vertex.cpp" />
@@ -165,7 +166,6 @@
     <ClInclude Include="BUILD_OPTIONS.h" />
     <ClInclude Include="FileIO.h" />
     <ClInclude Include="GameObject.h" />
-    <ClInclude Include="Main.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="Platform.h" />
@@ -173,6 +173,7 @@
     <ClInclude Include="RenderingEngine.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="Util.h" />
     <ClInclude Include="Vector2f.h" />
     <ClInclude Include="Vector3f.h" />
     <ClInclude Include="Vertex.h" />

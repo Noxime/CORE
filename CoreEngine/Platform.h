@@ -21,3 +21,4 @@ Aaro Perämaa
 #include <array>
 
 #include <vulkan/vulkan.h> //Should be only vulkan include in the whole program
+#include <GL\glew.h>

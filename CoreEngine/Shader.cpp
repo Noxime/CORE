@@ -15,3 +15,8 @@ Shader::~Shader()
 
 }
 
+uint32_t Shader::getId()
+{
+	return m_program;
+}
+

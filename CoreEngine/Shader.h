@@ -10,6 +10,7 @@ public:
 	Shader(int program);
 	~Shader();
 
+	uint32_t getId();
 
 private:
 
