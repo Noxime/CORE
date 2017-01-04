@@ -12,10 +12,11 @@ bool RenderingEngine::run()
 {
 	if (m_window != nullptr)
 	{
-		drawFrame();
 
 		return m_window->update();
 	}
 	return true;
 }
+
+
 

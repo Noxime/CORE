@@ -10,6 +10,8 @@ layout(location = 4) in vec3 fTangent;
 
 layout(location = 0) out vec4 outColor;
 
+//uniform vec3 uTest;
+
 void main() {
-	outColor = vec4(0, 1, 0, 1);
+	outColor = vec4(fTexcoord0, 0.5, 1);
 }

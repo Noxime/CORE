@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Platform.h"
-#include "RenderingEngine.h"
+
+
 
 class Shader
 {

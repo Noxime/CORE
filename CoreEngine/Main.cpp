@@ -1,8 +1,8 @@
 /*
-Core engine
+CoreEngine
 
 Aaro Perämaa
-2016
+2017
 */
 
 #include "RenderingEngine.h"
@@ -17,35 +17,57 @@ Aaro Perämaa
 int main()
 {
 
+
+	std::vector<Vertex> v = { Vertex(Vector3f(0.25f,0.25f, 0), Vector2f(0, 0), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)),
+							  Vertex(Vector3f(0.75f,0.75f, 0), Vector2f(1, 0), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)),
+							  Vertex(Vector3f(0.25f,0.75f, 0), Vector2f(0, 1), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)),
+							  Vertex(Vector3f(0.75f,0.25f, 0), Vector2f(1, 1), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)),
+							  Vertex(Vector3f(0.75f,0.75f, 0), Vector2f(1, 0), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)),
+							  Vertex(Vector3f(0.25f,0.25f, 0), Vector2f(0, 0), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)) };
+	
+	std::vector<uint32_t> i = { 0, 1, 2,
+								3, 1, 0, };
+
+
+
+
+
 	RenderingEngine r(800, 600, "CoreEngine VK", true);
+	
 
 
-	Vertex v[] = { Vertex( Vector3f(-1, 0, 0), Vector2f(0, 0), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)),
-	               Vertex( Vector3f(-1, 1, 0), Vector2f(0, 0), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)),
-		           Vertex( Vector3f( 0, 1, 0), Vector2f(0, 0), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)),
-	               Vertex( Vector3f( 0, 0, 0), Vector2f(0, 0), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)) };
-
-	uint32_t i[] = { 0, 1, 2,
-					 2, 3, 1, };
-#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
-	Shader s = Shader(r.makeShader(FileIO::loadAsciiFile("../Resources/Shaders/shader.vert"), FileIO::loadAsciiFile("../Resources/Shaders/shader.frag")));
+#if BACKEND == BACKEND_GL
+	Shader s = r.makeShader(FileIO::loadAsciiFile("../Resources/Shaders/shader.vert"), FileIO::loadAsciiFile("../Resources/Shaders/shader.frag"));
 #else
-	Shader s = Shader(r.makeShader(FileIO::loadBinaryFile("../Resources/Shaders/vert.spv"), FileIO::loadBinaryFile("../Resources/Shaders/frag.spv")));
+	Shader s = r.makeShader(FileIO::loadBinaryFile("../Resources/Shaders/vert.spv"),   FileIO::loadBinaryFile("../Resources/Shaders/frag.spv"));
 #endif
 
-	r.useShader(s.getId());
+	Mesh m = r.makeMesh(v, i);
 
 	uint64_t frameCounter = 0;
 	clock_t nextTime = clock() + CLOCKS_PER_SEC;
 
+
 	while (r.run())
 	{
+
+		r.setUniform3f(s, "uTest", Vector3f(0, 1, 1));
+
+
+		//r.clearFrame();
+		r.drawMesh(m, s);
+
+
+
 		if (clock() > nextTime)
 		{
+			
+
 			nextTime = clock() + CLOCKS_PER_SEC;
-			std::cout << "FPS: " << frameCounter << std::endl;
+			std::cout << "Render: " << 1.0 / frameCounter << "ms, in FPS: " << frameCounter << std::endl;
 			frameCounter = 0;
 		}
+
 
 		frameCounter++;
 	}

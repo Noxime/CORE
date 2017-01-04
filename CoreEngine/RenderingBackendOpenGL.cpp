@@ -8,9 +8,9 @@ Aaro Perämaa
 #include "RenderingEngine.h"
 
 
-#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
+#if BACKEND == BACKEND_GL
 
-uint32_t RenderingEngine::makeShader(std::vector<char> vert, std::vector<char> frag)
+Shader RenderingEngine::makeShader(std::vector<char> vert, std::vector<char> frag)
 {
 	GLuint vertId = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragId = glCreateShader(GL_FRAGMENT_SHADER);
@@ -63,6 +63,14 @@ uint32_t RenderingEngine::makeShader(std::vector<char> vert, std::vector<char> f
 	glAttachShader(program, vertId);
 	glAttachShader(program, fragId);
 
+
+
+	glBindAttribLocation(program, Vertex::positionOffset,  "vPosition");
+	glBindAttribLocation(program, Vertex::texcoord0Offset, "vTexcoord0");
+	glBindAttribLocation(program, Vertex::texcoord1Offset, "vTexcoord1");
+	glBindAttribLocation(program, Vertex::normalOffset,    "vNormal");
+	glBindAttribLocation(program, Vertex::tangentOffset,   "vTangent");
+
 	glLinkProgram(program);
 
 	GLint isLinked = 0;
@@ -94,13 +102,132 @@ uint32_t RenderingEngine::makeShader(std::vector<char> vert, std::vector<char> f
 	glDetachShader(program, fragId);
 
 
-	return program;
+	return Shader(program);
 }
 
-void RenderingEngine::useShader(uint32_t program)
+
+
+Mesh RenderingEngine::makeMesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices)
 {
-	glUseProgram(program);
+
+	std::vector<Vector3f> position = std::vector<Vector3f>();
+	std::vector<Vector2f> tex0     = std::vector<Vector2f>();
+	std::vector<Vector2f> tex1     = std::vector<Vector2f>();
+	std::vector<Vector3f> normal   = std::vector<Vector3f>();
+	std::vector<Vector3f> tangent  = std::vector<Vector3f>();
+
+	position.reserve(vertices.size());
+	tex0.reserve(    vertices.size());
+	tex1.reserve(    vertices.size());
+	normal.reserve(  vertices.size());
+	tangent.reserve( vertices.size());
+
+	for each (Vertex v in vertices)
+	{
+		position.push_back(v.getPos());
+		tex0.push_back(    v.getTex0());
+		tex1.push_back(    v.getTex1());
+		normal.push_back(  v.getNorm());
+		tangent.push_back( v.getTang());
+	}
+
+	uint32_t vao = 0;
+	uint32_t elemBuf = 0;
+
+	uint32_t posBuf = 0;
+	uint32_t tex0Buf = 0;
+	uint32_t tex1Buf = 0;
+	uint32_t normBuf = 0;
+	uint32_t tangBuf = 0;
+	
+
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	glGenBuffers(1, &posBuf);
+
+	glBindBuffer(GL_ARRAY_BUFFER, posBuf);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(position[0]), &position[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(Vertex::positionOffset);
+	glVertexAttribPointer(    Vertex::positionOffset, Vertex::positionSize, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+	glGenBuffers(1, &tex0Buf);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, tex0Buf);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(tex0[0]), &tex0[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(Vertex::texcoord0Offset);
+	glVertexAttribPointer(    Vertex::texcoord0Offset, Vertex::texcoord0Size, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+	glGenBuffers(1, &tex1Buf);
+
+	glBindBuffer(GL_ARRAY_BUFFER, tex1Buf);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(tex1[0]), &tex1[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(Vertex::texcoord1Offset);
+	glVertexAttribPointer(    Vertex::texcoord1Offset, Vertex::texcoord1Size, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+
+	glGenBuffers(1, &normBuf);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, normBuf);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(normal[0]), &normal[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(Vertex::normalOffset);
+	glVertexAttribPointer(    Vertex::normalOffset, Vertex::normalSize, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+
+	glGenBuffers(1, &tangBuf);
+
+	glBindBuffer(GL_ARRAY_BUFFER, tangBuf);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(tangent[0]), &tangent[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(Vertex::tangentOffset);
+	glVertexAttribPointer(    Vertex::tangentOffset, Vertex::tangentSize, GL_FLOAT, GL_FALSE, 0, 0);
+
+	
+	glGenBuffers(1, &elemBuf);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elemBuf);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(indices[0]), &indices[0], GL_STATIC_DRAW);
+
+	//glGenBuffers(1, &elements);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elements);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ind), ind, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	return Mesh(vao, elemBuf, indices.size());
 }
+
+void RenderingEngine::setUniform2f(Shader target, std::string name, Vector2f vec)
+{
+	glUseProgram(target.getId());
+	glUniform2f(glGetUniformLocation(target.getId(), name.c_str()), vec.getX(), vec.getY());
+}
+
+void RenderingEngine::setUniform3f(Shader target, std::string name, Vector3f vec)
+{
+	glUniform3f(glGetUniformLocation(target.getId(), name.c_str()), vec.getX(), vec.getY(), vec.getZ());
+}
+
+void RenderingEngine::drawMesh(Mesh mesh, Shader shader)
+{
+	glBindBuffer(GL_ARRAY_BUFFER,         mesh.getVBO());
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.getEB());
+	glUseProgram(shader.getId());
+
+	glBindVertexArray(mesh.getVBO());
+
+	glDrawElements(GL_TRIANGLES, mesh.getVertCount(), GL_UNSIGNED_INT, 0);
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+
 
 
 RenderingEngine::RenderingEngine(uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
@@ -115,6 +242,9 @@ RenderingEngine::RenderingEngine(uint32_t width, uint32_t height, std::string ti
 		std::cout << "GL: " << glewGetErrorString(err) << std::endl;
 	}
 
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+
 }
 
 Window *RenderingEngine::createWindow(uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
@@ -124,19 +254,13 @@ Window *RenderingEngine::createWindow(uint32_t width, uint32_t height, std::stri
 	return m_window;
 }
 
-void RenderingEngine::drawFrame()
+void RenderingEngine::clearFrame()
 {
 	
 	glClearColor(1, 0, 1, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glBegin(GL_TRIANGLES);
 
-	glVertex3f(-1, 0, 0);
-	glVertex3f( 1,-1, 0);
-	glVertex3f( 0,-1, 0);
-
-	glEnd();
 }
 
 
@@ -144,6 +268,7 @@ void RenderingEngine::drawFrame()
 
 RenderingEngine::~RenderingEngine()
 {
+	
 	delete m_window; //Yeah no we dont want you
 }
 

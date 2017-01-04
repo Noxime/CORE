@@ -7,9 +7,11 @@ Aaro Perämaa
 
 #include "RenderingEngine.h"
 
-#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
+#if BACKEND == BACKEND_VK
 
-uint32_t RenderingEngine::makeShader(std::vector<char> vert, std::vector<char> frag)
+static uint32_t shaderID = 0;
+
+Shader RenderingEngine::makeShader(std::vector<char> vert, std::vector<char> frag)
 {
 	VkShaderModule vertModule;
 	VkShaderModule fragModule;
@@ -141,7 +143,9 @@ uint32_t RenderingEngine::makeShader(std::vector<char> vert, std::vector<char> f
 	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
 	pipelineLayoutInfo.pPushConstantRanges = 0; // Optional
 
-	if (vkCreatePipelineLayout(m_device, &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
+	VkPipelineLayout layout;
+
+	if (vkCreatePipelineLayout(m_device, &pipelineLayoutInfo, nullptr, &layout) != VK_SUCCESS) {
 		std::cout << "VK: Failed to create pipeline layout!" << std::endl;
 	}
 
@@ -158,23 +162,85 @@ uint32_t RenderingEngine::makeShader(std::vector<char> vert, std::vector<char> f
 	pipelineInfo.pDepthStencilState = nullptr; // Optional
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.pDynamicState = nullptr; // Optional
-	pipelineInfo.layout = m_pipelineLayout;
+	pipelineInfo.layout = layout;
 	pipelineInfo.renderPass = m_renderpass;
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 	pipelineInfo.basePipelineIndex = -1; // Optional
 
-	if (vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_pipeline) != VK_SUCCESS) {
+	VkPipeline pipeline;
+
+	if (vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
 		std::cout << "VK: Failed to create graphics pipeline!" << std::endl;
 	}
 
 	vkDestroyShaderModule(m_device, vertModule, nullptr);
 	vkDestroyShaderModule(m_device, fragModule, nullptr);
 
-	return 0;
+	shaderID++;
+
+	m_layouts[shaderID] = layout;
+	m_shaders[shaderID] = pipeline;
+
+	std::cout << "VK: Shader created" << std::endl;
+
+	m_currentShader = shaderID;
+
+	return Shader(shaderID);
 }
 
-void initVertexBuffer();
+
+uint32_t findMemoryType(VkPhysicalDevice pDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
+static uint32_t vertexID = 0;
+
+Mesh RenderingEngine::makeMesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices)
+{	
+	vertexID++;
+
+	VkBufferCreateInfo bufferInfo = {};
+	bufferInfo.sType              = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferInfo.size               = sizeof(vertices[0]) * vertices.size();
+
+	bufferInfo.usage              = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+	bufferInfo.sharingMode        = VK_SHARING_MODE_EXCLUSIVE;
+
+	if (vkCreateBuffer(m_device, &bufferInfo, nullptr, &m_vertexBuffers[vertexID]) != VK_SUCCESS) {
+		std::cerr << "VK: Failed to create vertex buffer!" << std::endl;
+	}
+
+
+	VkMemoryRequirements memRequirements;
+	vkGetBufferMemoryRequirements(m_device, m_vertexBuffers[vertexID], &memRequirements);
+
+	VkMemoryAllocateInfo allocInfo = {};
+	allocInfo.sType                = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocInfo.allocationSize       = memRequirements.size;
+	allocInfo.memoryTypeIndex      = findMemoryType(m_pDevice, memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+
+	if (vkAllocateMemory(m_device, &allocInfo, nullptr, &m_vertexMemories[vertexID]) != VK_SUCCESS) { //Wow retarted me had a wrong variable in there. I had m_vertexBuffers, idiot
+		std::cerr << "VK: Failed to allocate vertex buffer memory!" << std::endl;
+	}
+
+	vkBindBufferMemory(m_device, m_vertexBuffers[vertexID], m_vertexMemories[vertexID], 0);
+
+	void* data;
+	vkMapMemory(m_device, m_vertexMemories[vertexID], 0, bufferInfo.size, 0, &data);
+
+	memcpy(data, vertices.data(), (size_t)bufferInfo.size);
+	vkUnmapMemory(m_device, m_vertexMemories[vertexID]);
+
+	
+	std::cout << "VK: Mesh created" << std::endl;
+	
+	return Mesh(vertexID, 0, indices.size());
+
+}
+
+
+
+
 
 RenderingEngine::RenderingEngine(uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
 {
@@ -191,11 +257,12 @@ RenderingEngine::RenderingEngine(uint32_t width, uint32_t height, std::string ti
 	initSwapchain();
 	initImageViews();
 	initRenderpass();
-	initPipeline();
+	//initPipeline();
+
 	initFramebuffers();
 	initCommandPool();
 
-	initVertexBuffer();
+	//initVertexBuffer();
 
 	initCommandBuffers();
 	initSemaphores();
@@ -215,7 +282,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 	const char* msg,
 	void* userData) {
 
-	std::cerr << "Validation layer: " << msg << std::endl;
+	std::cerr << "VK: " << layerPrefix << ": " <<  msg << std::endl;
 
 	return VK_FALSE;
 }
@@ -297,7 +364,7 @@ std::vector<const char*> getRequiredExtensions() {
 		extensions.push_back(glfwExtensions[i]);
 	}
 
-#ifdef BUILD_ENABLE_VULKAN_DEBUG
+#ifdef VK_DEBUG
 		extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
 #endif // BUILD_ENABLE_VULKAN_DEBUG
 
@@ -464,7 +531,7 @@ uint32_t findMemoryType(VkPhysicalDevice pDevice, uint32_t typeFilter, VkMemoryP
 // INIT INIT INIT
 void RenderingEngine::initInstance()
 {
-#ifdef BUILD_ENABLE_VULKAN_DEBUG
+#ifdef VK_DEBUG
 	if (!checkValidationLayerSupport()) {
 		std::cout << "VK: Validation layers requested, but not available!";
 	}
@@ -487,7 +554,7 @@ void RenderingEngine::initInstance()
 	createInfo.enabledExtensionCount   = extensions.size();
 	createInfo.ppEnabledExtensionNames = extensions.data();
 
-#ifdef BUILD_ENABLE_VULKAN_DEBUG
+#ifdef VK_DEBUG
 		createInfo.enabledLayerCount   = validationLayers.size();
 		createInfo.ppEnabledLayerNames = validationLayers.data();
 #else
@@ -502,7 +569,7 @@ void RenderingEngine::initInstance()
 
 void RenderingEngine::initDebugCallback()
 {
-#ifdef BUILD_ENABLE_VULKAN_DEBUG
+#ifdef VK_DEBUG
 
 	VkDebugReportCallbackCreateInfoEXT createInfo = {};
 	createInfo.sType                              = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
@@ -573,7 +640,7 @@ void RenderingEngine::initDevice()
 	createInfo.enabledExtensionCount   = deviceExtensions.size();
 	createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
-#ifdef BUILD_ENABLE_VULKAN_DEBUG
+#ifdef VK_DEBUG
 		createInfo.enabledLayerCount   = validationLayers.size();
 		createInfo.ppEnabledLayerNames = validationLayers.data();
 #else
@@ -736,6 +803,7 @@ void RenderingEngine::initRenderpass()
 
 }
 
+/*
 void RenderingEngine::initPipeline()
 {
 	auto vertsource = FileIO::loadFile("../resources/shaders/vert.spv");
@@ -901,7 +969,7 @@ void RenderingEngine::initPipeline()
 	vkDestroyShaderModule(m_device, vertModule, nullptr);
 	vkDestroyShaderModule(m_device, fragModule, nullptr);
 }
-
+*/
 
 
 void RenderingEngine::initFramebuffers()
@@ -947,12 +1015,12 @@ void RenderingEngine::initCommandPool()
 }
 
 //nuevas sabor delicias
-
+/*
 void RenderingEngine::initVertexBuffer()
 {
 	VkBufferCreateInfo bufferInfo = {};
 	bufferInfo.sType              = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size               = sizeof(vertices[0]) * vertices.size();
+	bufferInfo.size               = sizeof(exampleVertices[0]) * exampleVertices.size();
 
 	bufferInfo.usage              = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 	bufferInfo.sharingMode        = VK_SHARING_MODE_EXCLUSIVE;
@@ -980,9 +1048,10 @@ void RenderingEngine::initVertexBuffer()
 	void* data;
 	vkMapMemory(m_device, m_vertexMemory, 0, bufferInfo.size, 0, &data);
 
-	memcpy(data, vertices.data(), (size_t)bufferInfo.size);
+	memcpy(data, exampleVertices.data(), (size_t)bufferInfo.size);
 	vkUnmapMemory(m_device, m_vertexMemory);
 }
+*/
 
 void RenderingEngine::initCommandBuffers()
 {
@@ -1005,7 +1074,7 @@ void RenderingEngine::initCommandBuffers()
 
 
 	
-	reRecordCmdBuf();
+	//reRecordCmdBuf();
 
 
 }
@@ -1043,8 +1112,9 @@ void RenderingEngine::initSemaphores()
 
 
 
-void threadedCmdRecord(VkCommandBuffer buf, VkRenderPass ren, VkFramebuffer fra, VkExtent2D ext, VkPipeline pip, VkBuffer vb, std::vector<Vertex> v)
+void threadedCmdRecord(VkCommandBuffer buf, VkRenderPass ren, VkFramebuffer fra, VkExtent2D ext, VkPipeline pip, VkBuffer vb, uint32_t vCount, bool clear)
 {
+	
 	VkCommandBufferBeginInfo beginInfo = {};
 	beginInfo.sType                    = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 	beginInfo.flags                    = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
@@ -1059,10 +1129,12 @@ void threadedCmdRecord(VkCommandBuffer buf, VkRenderPass ren, VkFramebuffer fra,
 	renderPassInfo.renderArea.offset     = { 0, 0 };
 	renderPassInfo.renderArea.extent     = ext;
 
-	VkClearValue clearColor        = { 1.0f, 0.0f, 1.0f, 1.0f };
-	renderPassInfo.clearValueCount = 1;
-	renderPassInfo.pClearValues    = &clearColor;
-
+	//if (clear)
+	{
+		VkClearValue clearColor        = { 1.0f, 0.0f, 1.0f, 1.0f };
+		renderPassInfo.clearValueCount = 1;
+		renderPassInfo.pClearValues    = &clearColor;
+	}
 	vkCmdBeginRenderPass(buf, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 
@@ -1072,7 +1144,7 @@ void threadedCmdRecord(VkCommandBuffer buf, VkRenderPass ren, VkFramebuffer fra,
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(buf, 0, 1, vertexBuffers, offsets);
 
-	vkCmdDraw(buf, v.size(), 1, 0, 0);
+	vkCmdDraw(buf, vCount, 1, 0, 0);
 
 
 //	vkCmdBindPipeline(buf, VK_PIPELINE_BIND_POINT_GRAPHICS, pip);// Pipeline binding!
@@ -1085,26 +1157,109 @@ void threadedCmdRecord(VkCommandBuffer buf, VkRenderPass ren, VkFramebuffer fra,
 		std::cout << "VK: Failed to record command buffer!" << std::endl;
 	}
 
+	
+
+
 }
 
 
-void RenderingEngine::reRecordCmdBuf()
+void RenderingEngine::reRecordCmdBuf(uint32_t vertexCount, uint32_t vertexBuf)
 {
 	for (size_t i = 0; i < m_commandBuffers.size(); i++) {
 		
 #ifdef MULTITHREAD
-		std::future<void> thread = std::async(threadedCmdRecord, m_commandBuffers[i], m_renderpass, m_framebuffers[i], m_scExtent, m_pipeline, m_vertexBuffer, vertices);
+		std::future<void> thread = std::async(threadedCmdRecord, m_commandBuffers[i], m_renderpass, m_framebuffers[i], m_scExtent, m_shaders[m_currentShader], m_vertexBuffers[vertexBuf], vertexCount, m_clearQueued);
 #else
-		threadedCmdRecord(m_commandBuffers[i], m_renderpass, m_framebuffers[i], m_scExtent, m_pipeline, m_vertexBuffer, vertices);
+		threadedCmdRecord(m_commandBuffers[i], m_renderpass, m_framebuffers[i], m_scExtent, m_shaders[m_currentShader], m_vertexBuffers[vertexBuf], vertexCount, m_clearQueued);
 #endif
 	}
 
+	if (m_clearQueued)
+		m_clearQueued = false;
 }
 
-void RenderingEngine::drawFrame()
+void RenderingEngine::clearFrame()
 {
-	
-	reRecordCmdBuf();
+
+	for (size_t i = 0; i < m_commandBuffers.size(); i++) {
+		VkCommandBufferBeginInfo beginInfo = {};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+		beginInfo.pInheritanceInfo = nullptr; // Optional
+
+		vkBeginCommandBuffer(m_commandBuffers[i], &beginInfo);
+
+		VkRenderPassBeginInfo renderPassInfo = {};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassInfo.renderPass = m_renderpass;
+		renderPassInfo.framebuffer = m_framebuffers[i];
+		renderPassInfo.renderArea.offset = { 0, 0 };
+		renderPassInfo.renderArea.extent = m_scExtent;
+
+		//if (clear)
+		{
+			VkClearValue clearColor = { 1.0f, 0.0f, 1.0f, 1.0f };
+			renderPassInfo.clearValueCount = 1;
+			renderPassInfo.pClearValues = &clearColor;
+		}
+		vkCmdBeginRenderPass(m_commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		//	vkCmdBindPipeline(buf, VK_PIPELINE_BIND_POINT_GRAPHICS, pip);// Pipeline binding!
+
+		//	vkCmdDraw(buf, 3, 1, 0, 0); //Draw the triangles, vert count, instance count, first vert, first inst.
+
+		vkCmdEndRenderPass(m_commandBuffers[i]); //STOP HAVING FUN
+
+		if (vkEndCommandBuffer(m_commandBuffers[i]) != VK_SUCCESS) { //Did everything go great?
+			std::cout << "VK: Failed to record command buffer!" << std::endl;
+		}
+	}
+
+	uint32_t imageIndex; //Acquire next image
+	vkAcquireNextImageKHR(m_device, m_swapchain, std::numeric_limits<uint64_t>::max(), m_imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+
+
+	VkSubmitInfo submitInfo = {};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+	VkSemaphore waitSemaphores[] = { m_imageAvailableSemaphore };
+	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+	submitInfo.waitSemaphoreCount = 1;
+	submitInfo.pWaitSemaphores = waitSemaphores;
+	submitInfo.pWaitDstStageMask = waitStages;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &m_commandBuffers[imageIndex];
+
+	VkSemaphore signalSemaphores[] = { m_renderFinishedSemaphore };
+	submitInfo.signalSemaphoreCount = 1;
+	submitInfo.pSignalSemaphores = signalSemaphores;
+
+	if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) {
+		std::cout << "VK: Failed to submit draw command buffer!" << std::endl;
+	}
+
+	VkPresentInfoKHR presentInfo = {};
+	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+	presentInfo.waitSemaphoreCount = 1;
+	presentInfo.pWaitSemaphores = signalSemaphores;
+
+	VkSwapchainKHR swapChains[] = { m_swapchain };
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = swapChains;
+	presentInfo.pImageIndices = &imageIndex;
+	presentInfo.pResults = nullptr; // Optional
+
+	vkQueuePresentKHR(m_presentQueue, &presentInfo); //Show
+
+	vkDeviceWaitIdle(m_device);
+}
+
+void RenderingEngine::drawMesh(Mesh mesh, Shader shader)
+{
+	m_currentShader = shader.getId();
+	m_currentVB     = mesh.getVBO();
+	reRecordCmdBuf(   mesh.getVertCount(), mesh.getVBO());
 
 	uint32_t imageIndex; //Acquire next image
 	vkAcquireNextImageKHR(m_device, m_swapchain, std::numeric_limits<uint64_t>::max(), m_imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
@@ -1146,6 +1301,17 @@ void RenderingEngine::drawFrame()
 	vkDeviceWaitIdle(m_device);
 }
 
+void RenderingEngine::setUniform2f(Shader target, std::string name, Vector2f vec)
+{
+	
+}
+
+void RenderingEngine::setUniform3f(Shader target, std::string name, Vector3f vec)
+{
+	
+}
+
+
 Window *RenderingEngine::createWindow(uint32_t width, uint32_t height, std::string title, bool vsyncRequested)
 {
 	m_window = new Window(width, height, title, vsyncRequested);
@@ -1163,9 +1329,17 @@ void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT
 
 RenderingEngine::~RenderingEngine()
 {
-	vkFreeMemory(m_device, m_vertexMemory, nullptr);
+	vkDeviceWaitIdle(m_device);
 
-	vkDestroyBuffer(m_device, m_vertexBuffer, nullptr);
+	for each(auto mem in m_vertexMemories)
+	{
+		vkFreeMemory(m_device, mem.second, nullptr);
+	}
+
+	for  each(auto buf in m_vertexBuffers)
+	{
+		vkDestroyBuffer(m_device, buf.second, nullptr);
+	}
 
 	vkFreeCommandBuffers(m_device, m_commandPool, m_commandBuffers.size(), m_commandBuffers.data());
 
@@ -1181,8 +1355,14 @@ RenderingEngine::~RenderingEngine()
 
 
 	vkDestroyRenderPass(m_device, m_renderpass, nullptr);
-	vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
-	vkDestroyPipeline(m_device, m_pipeline, nullptr);
+	for (auto& layout : m_layouts)
+	{
+		vkDestroyPipelineLayout(m_device, layout.second, nullptr);
+	}
+	for (auto& pipeline : m_shaders)
+	{
+		vkDestroyPipeline(m_device, pipeline.second, nullptr);
+	}
 
 
 	for each (auto imageView in m_scImageViews)

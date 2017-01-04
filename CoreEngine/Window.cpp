@@ -21,7 +21,7 @@ Window::Window(uint32_t width, uint32_t height, std::string title, bool vsyncReq
 
 	glfwInit();
 
-#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_VULKAN
+#if BACKEND == BACKEND_VK
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); //Dont create a gl context
 	glfwWindowHint(GLFW_RESIZABLE,  GLFW_FALSE);
 #else
@@ -33,7 +33,8 @@ Window::Window(uint32_t width, uint32_t height, std::string title, bool vsyncReq
 
 	glfwSwapInterval(vsyncRequested);
 
-#if BUILD_WITH_RENDERING_BACKEND
+
+#if BACKEND == BACKEND_GL
 	glfwMakeContextCurrent(m_window);
 #endif
 }
@@ -49,7 +50,7 @@ bool Window::update()
 
 	glfwGetWindowSize(m_window, &width, &height);
 
-#if BUILD_WITH_RENDERING_BACKEND == RENDERING_BACKEND_OPENGL
+#if BACKEND == BACKEND_GL
 	glViewport(0, 0, width, height);
 #endif
 	

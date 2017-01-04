@@ -8,6 +8,7 @@
 #include "Vertex.h"
 #include "GameObject.h"
 #include "Util.h"
+#include "Shader.h"
 
 class RenderingEngine
 {
@@ -17,8 +18,14 @@ public:
 
 
 	bool run(); //While returns true game will run. Also updates the renderer class
-	uint32_t makeShader(std::vector<char> vert, std::vector<char> frag);
-	void     useShader(uint32_t program);
+	Shader makeShader(std::vector<char> vert, std::vector<char> frag);
+	Mesh   makeMesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices);
+
+	void setUniform2f(Shader target, std::string name, Vector2f vec);
+	void setUniform3f(Shader target, std::string name, Vector3f vec);
+
+	void clearFrame();
+	void drawMesh(Mesh mesh, Shader shader);
 
 private:
 
@@ -35,33 +42,41 @@ private:
 	VkExtent2D                                            m_scExtent;                 //Swapchain size
 	std::vector<VkImageView>                              m_scImageViews;             //We see the images through these
 	VkRenderPass                                          m_renderpass;               //Renderpass
-	VkPipelineLayout                                      m_pipelineLayout;           //Will be used later
-	VkPipeline                                            m_pipeline;                 //The pipeline used
+	//VkPipelineLayout                                      m_pipelineLayout;           //Will be used later
+	//VkPipeline                                            m_pipeline;                 //The pipeline used
 	std::vector<VkFramebuffer>                            m_framebuffers;             //Freimbaffers
 	VkCommandPool                                         m_commandPool;              //This is why we are here
 	std::vector<VkCommandBuffer>                          m_commandBuffers;           //Multithread this bitch
 	VkSemaphore                                           m_imageAvailableSemaphore;  //We have got the image and were ready to render
 	VkSemaphore                                           m_renderFinishedSemaphore;  //We have got the render and were ready to present
 
-	VkBuffer m_vertexBuffer;
-	VkDeviceMemory m_vertexMemory;
+	bool m_clearQueued = false;
 
-	std::vector<VkPipeline> m_shaders;
+	
 
-	std::vector<Vertex> vertices = {
-		Vertex(Vector3f( -1, 0, 0), Vector2f( 0, 0), Vector2f( 0, 0), Vector3f( 0, 0, 1), Vector3f( 1, 0, 0)),
+	uint32_t                             m_currentShader = 0;
+	std::map<uint32_t, VkPipelineLayout> m_layouts;
+	std::map<uint32_t, VkPipeline>       m_shaders;
+
+	uint32_t                           m_currentVB = 0;
+	std::map<uint32_t, VkBuffer>       m_vertexBuffers;
+	std::map<uint32_t, VkDeviceMemory> m_vertexMemories;
+
+	/*
+	std::vector<Vertex> exampleVertices = {
+		Vertex(Vector3f(-1, 0, 0), Vector2f( 0, 0), Vector2f( 0, 0), Vector3f( 0, 0, 1), Vector3f( 1, 0, 0)),
 		Vertex(Vector3f( 1, 1, 0), Vector2f( 0, 0), Vector2f( 0, 0), Vector3f( 0, 0, 1), Vector3f( 1, 0, 0)),
 		Vertex(Vector3f( 0, 1, 0), Vector2f( 0, 0), Vector2f( 0, 0), Vector3f( 0, 0, 1), Vector3f( 1, 0, 0)),
 	};
-	
+	*/
 	
 
 	Window *createWindow(uint32_t width, uint32_t height, std::string title, bool vsyncRequested); //Window create and open
 
 	//void init();
 
-	void drawFrame();
-	void reRecordCmdBuf();
+	
+	void reRecordCmdBuf(uint32_t vc, uint32_t vertexBuf);
 
 	void initInstance();
 	void initDebugCallback();
@@ -71,11 +86,11 @@ private:
 	void initSwapchain();
 	void initImageViews();
 	void initRenderpass();
-	void initPipeline();
+	//void initPipeline();
 	void initFramebuffers();
 	void initCommandPool();
 
-	void initVertexBuffer();
+	//void initVertexBuffer();
 
 	void initCommandBuffers();
 	void initSemaphores();

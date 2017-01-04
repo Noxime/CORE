@@ -7,11 +7,11 @@ Aaro Perämaa
 
 #pragma once
 
-#define BUILD_ENABLE_VULKAN_DEBUG         //Debug messages
+#define VK_DEBUG         //Debug messages
 
-#define RENDERING_BACKEND_VULKAN 0
-#define RENDERING_BACKEND_OPENGL 1
+#define BACKEND_VK 0
+#define BACKEND_GL 1
 
-#define BUILD_WITH_RENDERING_BACKEND RENDERING_BACKEND_OPENGL
+#define BACKEND BACKEND_VK
 
-#define MULTITHREAD
+//#define MULTITHREAD

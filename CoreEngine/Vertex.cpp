@@ -21,6 +21,31 @@ Vertex::~Vertex()
 {
 }
 
+Vector3f Vertex::getPos()
+{
+	return m_position;
+}
+
+Vector2f Vertex::getTex0()
+{
+	return m_texcoord_primary;
+}
+
+Vector2f Vertex::getTex1()
+{
+	return m_texcoord_secondary;
+}
+
+Vector3f Vertex::getNorm()
+{
+	return m_normal;
+}
+
+Vector3f Vertex::getTang()
+{
+	return m_tangent;
+}
+
 VkVertexInputBindingDescription Vertex::getBindingDescription()
 {
 	VkVertexInputBindingDescription bindingDescription = {};
