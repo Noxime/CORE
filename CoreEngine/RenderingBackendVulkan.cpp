@@ -198,22 +198,50 @@ Mesh RenderingEngine::makeMesh(std::vector<Vertex> vertices, std::vector<uint32_
 {	
 	vertexID++;
 
-	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+	{ //Vertex buffer
+		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+		VkBuffer stagingBuffer;
+		VkDeviceMemory stagingBufferMemory;
+		createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
-	void* data;
-	vkMapMemory(m_device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, vertices.data(), (size_t)bufferSize);
-	vkUnmapMemory(m_device, stagingBufferMemory);
+		void* data;
+		vkMapMemory(m_device, stagingBufferMemory, 0, bufferSize, 0, &data);
+		memcpy(data, vertices.data(), (size_t)bufferSize);
+		vkUnmapMemory(m_device, stagingBufferMemory);
 
-	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_vertexBuffers[vertexID], m_vertexMemories[vertexID]);
-	
-	copyBuffer(stagingBuffer, m_vertexBuffers[vertexID], bufferSize);
+		createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_vertexBuffers[vertexID], m_vertexMemories[vertexID]);
 
-	return Mesh(vertexID, 0, indices.size());
+		copyBuffer(stagingBuffer, m_vertexBuffers[vertexID], bufferSize);
+
+		vkDestroyBuffer(m_device, stagingBuffer, nullptr); //Cleanup
+		vkFreeMemory(m_device, stagingBufferMemory, nullptr);
+	}
+
+	{ //Index buffer
+		VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+		VkBuffer stagingBuffer;
+		VkDeviceMemory stagingBufferMemory;
+		createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+		void* data;
+		vkMapMemory(m_device, stagingBufferMemory, 0, bufferSize, 0, &data);
+		memcpy(data, indices.data(), (size_t)bufferSize);
+		vkUnmapMemory(m_device, stagingBufferMemory);
+
+		createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_indexBuffers[vertexID], m_indexMemories[vertexID]); //Difference is here
+
+		copyBuffer(stagingBuffer, m_indexBuffers[vertexID], bufferSize);
+
+		vkDestroyBuffer(m_device, stagingBuffer, nullptr); //Cleanup
+		vkFreeMemory(m_device, stagingBufferMemory, nullptr);
+	}
+
+
+	std::cout << "VK: Created mesh" << std::endl;
+
+	return Mesh(vertexID, 0, vertices.size(), indices.size());
 
 }
 
@@ -1091,7 +1119,7 @@ void RenderingEngine::initSemaphores()
 
 
 
-void threadedCmdRecord(VkCommandBuffer buf, VkRenderPass ren, VkFramebuffer fra, VkExtent2D ext, VkPipeline pip, VkBuffer vb, uint32_t vCount, bool clear)
+void threadedCmdRecord(VkCommandBuffer buf, VkRenderPass ren, VkFramebuffer fra, VkExtent2D ext, VkPipeline pip, VkBuffer vb, VkBuffer ib, uint32_t vCount, bool clear)
 {
 	
 	VkCommandBufferBeginInfo beginInfo = {};
@@ -1121,10 +1149,12 @@ void threadedCmdRecord(VkCommandBuffer buf, VkRenderPass ren, VkFramebuffer fra,
 
 	VkBuffer vertexBuffers[] = { vb };
 	VkDeviceSize offsets[] = { 0 };
-	vkCmdBindVertexBuffers(buf, 0, 1, vertexBuffers, offsets);
+	vkCmdBindVertexBuffers(buf, 0, 1, vertexBuffers, offsets); //Vertex buffers
 
-	vkCmdDraw(buf, vCount, 1, 0, 0);
+	vkCmdBindIndexBuffer(buf, ib, 0, VK_INDEX_TYPE_UINT32); //Index buffers
 
+	//vkCmdDraw(buf, vCount, 1, 0, 0);
+	vkCmdDrawIndexed(buf, vCount, 1, 0, 0, 0);
 
 //	vkCmdBindPipeline(buf, VK_PIPELINE_BIND_POINT_GRAPHICS, pip);// Pipeline binding!
 
@@ -1142,14 +1172,14 @@ void threadedCmdRecord(VkCommandBuffer buf, VkRenderPass ren, VkFramebuffer fra,
 }
 
 
-void RenderingEngine::reRecordCmdBuf(uint32_t vertexCount, uint32_t vertexBuf)
+void RenderingEngine::reRecordCmdBuf(uint32_t indexCount, uint32_t vertexBuf)
 {
 	for (size_t i = 0; i < m_commandBuffers.size(); i++) {
 		
 #ifdef MULTITHREAD
-		std::future<void> thread = std::async(threadedCmdRecord, m_commandBuffers[i], m_renderpass, m_framebuffers[i], m_scExtent, m_shaders[m_currentShader], m_vertexBuffers[vertexBuf], vertexCount, m_clearQueued);
+		std::future<void> thread = std::async(threadedCmdRecord, m_commandBuffers[i], m_renderpass, m_framebuffers[i], m_scExtent, m_shaders[m_currentShader], m_vertexBuffers[vertexBuf], m_indexBuffers[vertexBuf], indexCount, m_clearQueued);
 #else
-		threadedCmdRecord(m_commandBuffers[i], m_renderpass, m_framebuffers[i], m_scExtent, m_shaders[m_currentShader], m_vertexBuffers[vertexBuf], vertexCount, m_clearQueued);
+		threadedCmdRecord(m_commandBuffers[i], m_renderpass, m_framebuffers[i], m_scExtent, m_shaders[m_currentShader], m_vertexBuffers[vertexBuf], m_indexBuffers[vertexBuf], indexCount, m_clearQueued);
 #endif
 	}
 
@@ -1160,10 +1190,10 @@ void RenderingEngine::reRecordCmdBuf(uint32_t vertexCount, uint32_t vertexBuf)
 void RenderingEngine::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer & buffer, VkDeviceMemory & memory)
 {
 	VkBufferCreateInfo bufferInfo = {};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = size;
-	bufferInfo.usage = usage;
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	bufferInfo.sType              = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferInfo.size               = size;
+	bufferInfo.usage              = usage;
+	bufferInfo.sharingMode        = VK_SHARING_MODE_EXCLUSIVE;
 
 	if (vkCreateBuffer(m_device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create buffer!");
@@ -1303,7 +1333,7 @@ void RenderingEngine::drawMesh(Mesh mesh, Shader shader)
 {
 	m_currentShader = shader.getId();
 	m_currentVB     = mesh.getVBO();
-	reRecordCmdBuf(   mesh.getVertCount(), mesh.getVBO());
+	reRecordCmdBuf(   mesh.getIndexCount(), mesh.getVBO());
 
 	uint32_t imageIndex; //Acquire next image
 	vkAcquireNextImageKHR(m_device, m_swapchain, std::numeric_limits<uint64_t>::max(), m_imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
@@ -1380,7 +1410,16 @@ RenderingEngine::~RenderingEngine()
 		vkFreeMemory(m_device, mem.second, nullptr);
 	}
 
+	for each(auto mem in m_indexMemories)
+	{
+		vkFreeMemory(m_device, mem.second, nullptr);
+	}
+
 	for  each(auto buf in m_vertexBuffers)
+	{
+		vkDestroyBuffer(m_device, buf.second, nullptr);
+	}
+	for  each(auto buf in m_indexBuffers)
 	{
 		vkDestroyBuffer(m_device, buf.second, nullptr);
 	}

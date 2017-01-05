@@ -59,8 +59,11 @@ private:
 	std::map<uint32_t, VkPipeline>       m_shaders;
 
 	uint32_t                           m_currentVB = 0;
+
 	std::map<uint32_t, VkBuffer>       m_vertexBuffers;
 	std::map<uint32_t, VkDeviceMemory> m_vertexMemories;
+	std::map<uint32_t, VkBuffer>       m_indexBuffers;
+	std::map<uint32_t, VkDeviceMemory> m_indexMemories;
 
 	/*
 	std::vector<Vertex> exampleVertices = {

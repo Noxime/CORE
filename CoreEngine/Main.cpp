@@ -21,9 +21,7 @@ int main()
 	std::vector<Vertex> v = { Vertex(Vector3f(0.25f,0.25f, 0), Vector2f(0, 0), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)),
 							  Vertex(Vector3f(0.75f,0.75f, 0), Vector2f(1, 0), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)),
 							  Vertex(Vector3f(0.25f,0.75f, 0), Vector2f(0, 1), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)),
-							  Vertex(Vector3f(0.75f,0.25f, 0), Vector2f(1, 1), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)),
-							  Vertex(Vector3f(0.75f,0.75f, 0), Vector2f(1, 0), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)),
-							  Vertex(Vector3f(0.25f,0.25f, 0), Vector2f(0, 0), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)) };
+							  Vertex(Vector3f(0.75f,0.25f, 0), Vector2f(1, 1), Vector2f(0, 0), Vector3f(0, 0, 1), Vector3f(0, 1, 0)), };
 	
 	std::vector<uint32_t> i = { 0, 1, 2,
 								3, 1, 0, };
