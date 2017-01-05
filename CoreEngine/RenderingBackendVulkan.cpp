@@ -198,42 +198,21 @@ Mesh RenderingEngine::makeMesh(std::vector<Vertex> vertices, std::vector<uint32_
 {	
 	vertexID++;
 
-	VkBufferCreateInfo bufferInfo = {};
-	bufferInfo.sType              = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size               = sizeof(vertices[0]) * vertices.size();
+	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
-	bufferInfo.usage              = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-	bufferInfo.sharingMode        = VK_SHARING_MODE_EXCLUSIVE;
-
-	if (vkCreateBuffer(m_device, &bufferInfo, nullptr, &m_vertexBuffers[vertexID]) != VK_SUCCESS) {
-		std::cerr << "VK: Failed to create vertex buffer!" << std::endl;
-	}
-
-
-	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(m_device, m_vertexBuffers[vertexID], &memRequirements);
-
-	VkMemoryAllocateInfo allocInfo = {};
-	allocInfo.sType                = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocInfo.allocationSize       = memRequirements.size;
-	allocInfo.memoryTypeIndex      = findMemoryType(m_pDevice, memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-
-	if (vkAllocateMemory(m_device, &allocInfo, nullptr, &m_vertexMemories[vertexID]) != VK_SUCCESS) { //Wow retarted me had a wrong variable in there. I had m_vertexBuffers, idiot
-		std::cerr << "VK: Failed to allocate vertex buffer memory!" << std::endl;
-	}
-
-	vkBindBufferMemory(m_device, m_vertexBuffers[vertexID], m_vertexMemories[vertexID], 0);
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
 	void* data;
-	vkMapMemory(m_device, m_vertexMemories[vertexID], 0, bufferInfo.size, 0, &data);
+	vkMapMemory(m_device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, vertices.data(), (size_t)bufferSize);
+	vkUnmapMemory(m_device, stagingBufferMemory);
 
-	memcpy(data, vertices.data(), (size_t)bufferInfo.size);
-	vkUnmapMemory(m_device, m_vertexMemories[vertexID]);
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_vertexBuffers[vertexID], m_vertexMemories[vertexID]);
+	
+	copyBuffer(stagingBuffer, m_vertexBuffers[vertexID], bufferSize);
 
-	
-	std::cout << "VK: Mesh created" << std::endl;
-	
 	return Mesh(vertexID, 0, indices.size());
 
 }
@@ -1176,6 +1155,71 @@ void RenderingEngine::reRecordCmdBuf(uint32_t vertexCount, uint32_t vertexBuf)
 
 	if (m_clearQueued)
 		m_clearQueued = false;
+}
+
+void RenderingEngine::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer & buffer, VkDeviceMemory & memory)
+{
+	VkBufferCreateInfo bufferInfo = {};
+	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferInfo.size = size;
+	bufferInfo.usage = usage;
+	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	if (vkCreateBuffer(m_device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create buffer!");
+	}
+
+	VkMemoryRequirements memRequirements;
+	vkGetBufferMemoryRequirements(m_device, buffer, &memRequirements);
+
+	VkMemoryAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocInfo.allocationSize = memRequirements.size;
+	allocInfo.memoryTypeIndex = findMemoryType(m_pDevice, memRequirements.memoryTypeBits, properties);
+
+	if (vkAllocateMemory(m_device, &allocInfo, nullptr, &memory) != VK_SUCCESS) {
+		throw std::runtime_error("failed to allocate buffer memory!");
+	}
+
+	vkBindBufferMemory(m_device, buffer, memory, 0);
+}
+
+void RenderingEngine::copyBuffer(VkBuffer source, VkBuffer destination, VkDeviceSize size)
+{
+	VkCommandBufferAllocateInfo allocInfo = {};
+	allocInfo.sType                       = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level                       = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool                 = m_commandPool;
+	allocInfo.commandBufferCount          = 1;
+
+	VkCommandBuffer commandBuffer;
+	vkAllocateCommandBuffers(m_device, &allocInfo, &commandBuffer);
+
+	//Record the buffer
+	VkCommandBufferBeginInfo beginInfo = {};
+	beginInfo.sType                    = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags                    = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+	VkBufferCopy copyRegion = {};
+	copyRegion.srcOffset    = 0; // Optional
+	copyRegion.dstOffset    = 0; // Optional
+	copyRegion.size         = size;
+	vkCmdCopyBuffer(commandBuffer, source, destination, 1, &copyRegion);
+
+	vkEndCommandBuffer(commandBuffer); //Done recording, submit
+
+	VkSubmitInfo submitInfo       = {};
+	submitInfo.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers    = &commandBuffer;
+
+	vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(m_graphicsQueue);
+
+	vkFreeCommandBuffers(m_device, m_commandPool, 1, &commandBuffer); //cleanup
+
 }
 
 void RenderingEngine::clearFrame()

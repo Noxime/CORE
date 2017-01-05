@@ -77,6 +77,8 @@ private:
 
 	
 	void reRecordCmdBuf(uint32_t vc, uint32_t vertexBuf);
+	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &memory);
+	void copyBuffer(VkBuffer source, VkBuffer destination, VkDeviceSize size);
 
 	void initInstance();
 	void initDebugCallback();
