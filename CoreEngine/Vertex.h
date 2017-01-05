@@ -1,21 +1,19 @@
 #pragma once
 
 #include "Platform.h"
-#include "Vector2f.h"
-#include "Vector3f.h"
 
 class Vertex
 {
 public:
 	Vertex();
-	Vertex(Vector3f position, Vector2f texcoord0, Vector2f texcoord1, Vector3f normal, Vector3f tangent);
+	Vertex(glm::vec3 position, glm::vec2 texcoord0, glm::vec2 texcoord1, glm::vec3 normal, glm::vec3 tangent);
 	~Vertex();
 
-	Vector3f getPos();
-	Vector2f getTex0();
-	Vector2f getTex1();
-	Vector3f getNorm();
-	Vector3f getTang();
+	glm::vec3 getPos();
+	glm::vec2 getTex0();
+	glm::vec2 getTex1();
+	glm::vec3 getNorm();
+	glm::vec3 getTang();
 
 	static VkVertexInputBindingDescription getBindingDescription();
 	static std::array<VkVertexInputAttributeDescription, 5> getAttributeDescriptions();
@@ -33,11 +31,11 @@ public:
 	const static uint32_t tangentSize   = 3;
 
 private:
-	Vector3f m_position;
-	Vector2f m_texcoord_primary;
-	Vector2f m_texcoord_secondary;
-	Vector3f m_normal;
-	Vector3f m_tangent;
+	glm::vec3 m_position;
+	glm::vec2 m_texcoord_primary;
+	glm::vec2 m_texcoord_secondary;
+	glm::vec3 m_normal;
+	glm::vec3 m_tangent;
 
 };
 

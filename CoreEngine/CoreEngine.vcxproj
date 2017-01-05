@@ -69,19 +69,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\VulkanSDK\1.0.37.0\Include;C:\Users\Aarop\libraries\glew-2.0.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\VulkanSDK\1.0.37.0\Include;C:\Users\Aarop\libraries\glew-2.0.0\include;C:\Users\Aarop\libraries\glm;$(IncludePath)</IncludePath>
     <LibraryPath>C:\VulkanSDK\1.0.37.0\Bin32;C:\Users\Aarop\libraries\glew-2.0.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\VulkanSDK\1.0.37.0\Include;C:\Users\Aarop\libraries\glew-2.0.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\VulkanSDK\1.0.37.0\Include;C:\Users\Aarop\libraries\glew-2.0.0\include;C:\Users\Aarop\libraries\glm;$(IncludePath)</IncludePath>
     <LibraryPath>C:\VulkanSDK\1.0.37.0\Bin32;C:\Users\Aarop\libraries\glew-2.0.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\VulkanSDK\1.0.37.0\Include;C:\Users\Aarop\libraries\glew-2.0.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\VulkanSDK\1.0.37.0\Include;C:\Users\Aarop\libraries\glew-2.0.0\include;C:\Users\Aarop\libraries\glm;$(IncludePath)</IncludePath>
     <LibraryPath>C:\VulkanSDK\1.0.37.0\Bin32;C:\Users\Aarop\libraries\glew-2.0.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\VulkanSDK\1.0.37.0\Include;C:\Users\Aarop\libraries\glew-2.0.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\VulkanSDK\1.0.37.0\Include;C:\Users\Aarop\libraries\glew-2.0.0\include;C:\Users\Aarop\libraries\glm;$(IncludePath)</IncludePath>
     <LibraryPath>C:\VulkanSDK\1.0.37.0\Bin32;C:\Users\Aarop\libraries\glew-2.0.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -157,8 +157,6 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Util.cpp" />
-    <ClCompile Include="Vector2f.cpp" />
-    <ClCompile Include="Vector3f.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
@@ -174,8 +172,6 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Util.h" />
-    <ClInclude Include="Vector2f.h" />
-    <ClInclude Include="Vector3f.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

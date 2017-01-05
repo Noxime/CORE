@@ -21,8 +21,8 @@ public:
 	Shader makeShader(std::vector<char> vert, std::vector<char> frag);
 	Mesh   makeMesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices);
 
-	void setUniform2f(Shader target, std::string name, Vector2f vec);
-	void setUniform3f(Shader target, std::string name, Vector3f vec);
+	void setUniform2f(Shader target, std::string name, glm::vec2 vec);
+	void setUniform3f(Shader target, std::string name, glm::vec3 vec);
 
 	void clearFrame();
 	void drawMesh(Mesh mesh, Shader shader);

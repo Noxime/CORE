@@ -1189,6 +1189,8 @@ void RenderingEngine::reRecordCmdBuf(uint32_t indexCount, uint32_t vertexBuf)
 
 void RenderingEngine::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer & buffer, VkDeviceMemory & memory)
 {
+	//TODO: Allocate multiple resources from single allocation. //Idk what that means - me
+
 	VkBufferCreateInfo bufferInfo = {};
 	bufferInfo.sType              = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferInfo.size               = size;
@@ -1375,12 +1377,12 @@ void RenderingEngine::drawMesh(Mesh mesh, Shader shader)
 	vkDeviceWaitIdle(m_device);
 }
 
-void RenderingEngine::setUniform2f(Shader target, std::string name, Vector2f vec)
+void RenderingEngine::setUniform2f(Shader target, std::string name, glm::vec2 vec)
 {
 	
 }
 
-void RenderingEngine::setUniform3f(Shader target, std::string name, Vector3f vec)
+void RenderingEngine::setUniform3f(Shader target, std::string name, glm::vec3 vec)
 {
 	
 }

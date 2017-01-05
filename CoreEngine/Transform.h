@@ -1,26 +1,27 @@
 #pragma once
-#include "Vector3f.h"
 #include "Quaternion.h"
+#include <glm\glm.hpp>
+
 
 class Transform
 {
 public:
 	Transform();
-	Transform(Vector3f position, Quaternion rotation, Vector3f scale);
+	Transform(glm::vec3 position, Quaternion rotation, glm::vec3 scale);
 	~Transform();
 
-	Vector3f   getPosition();
+	glm::vec3  getPosition();
 	Quaternion getRotation();
-	Vector3f   getScale();
+	glm::vec3  getScale();
 
-	void setPosition(Vector3f position);
+	void setPosition(glm::vec3 position);
 	void setRotation(Quaternion rotation);
-	void setScale(Vector3f scale);
+	void setScale(glm::vec3 scale);
 
 private:
-	Vector3f   m_position;
+	glm::vec3  m_position;
 	Quaternion m_rotation;
-	Vector3f   m_scale;
+	glm::vec3  m_scale;
 
 };
 

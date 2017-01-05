@@ -110,11 +110,11 @@ Shader RenderingEngine::makeShader(std::vector<char> vert, std::vector<char> fra
 Mesh RenderingEngine::makeMesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices)
 {
 
-	std::vector<Vector3f> position = std::vector<Vector3f>();
-	std::vector<Vector2f> tex0     = std::vector<Vector2f>();
-	std::vector<Vector2f> tex1     = std::vector<Vector2f>();
-	std::vector<Vector3f> normal   = std::vector<Vector3f>();
-	std::vector<Vector3f> tangent  = std::vector<Vector3f>();
+	std::vector<glm::vec3> position = std::vector<glm::vec3>();
+	std::vector<glm::vec2> tex0     = std::vector<glm::vec2>();
+	std::vector<glm::vec2> tex1     = std::vector<glm::vec2>();
+	std::vector<glm::vec3> normal   = std::vector<glm::vec3>();
+	std::vector<glm::vec3> tangent  = std::vector<glm::vec3>();
 
 	position.reserve(vertices.size());
 	tex0.reserve(    vertices.size());
@@ -201,18 +201,18 @@ Mesh RenderingEngine::makeMesh(std::vector<Vertex> vertices, std::vector<uint32_
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	return Mesh(vao, elemBuf, indices.size());
+	return Mesh(vao, elemBuf, vertices.size(), indices.size());
 }
 
-void RenderingEngine::setUniform2f(Shader target, std::string name, Vector2f vec)
+void RenderingEngine::setUniform2f(Shader target, std::string name, glm::vec2 vec)
 {
 	glUseProgram(target.getId());
-	glUniform2f(glGetUniformLocation(target.getId(), name.c_str()), vec.getX(), vec.getY());
+	glUniform2f(glGetUniformLocation(target.getId(), name.c_str()), vec.x, vec.y);
 }
 
-void RenderingEngine::setUniform3f(Shader target, std::string name, Vector3f vec)
+void RenderingEngine::setUniform3f(Shader target, std::string name, glm::vec3 vec)
 {
-	glUniform3f(glGetUniformLocation(target.getId(), name.c_str()), vec.getX(), vec.getY(), vec.getZ());
+	glUniform3f(glGetUniformLocation(target.getId(), name.c_str()), vec.x, vec.y, vec.z);
 }
 
 void RenderingEngine::drawMesh(Mesh mesh, Shader shader)
@@ -223,7 +223,7 @@ void RenderingEngine::drawMesh(Mesh mesh, Shader shader)
 
 	glBindVertexArray(mesh.getVBO());
 
-	glDrawElements(GL_TRIANGLES, mesh.getVertCount(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, mesh.getIndexCount(), GL_UNSIGNED_INT, 0);
 	//glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
@@ -260,7 +260,11 @@ void RenderingEngine::clearFrame()
 	glClearColor(1, 0, 1, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
+	GLint err = glGetError();
+	if (err != GL_NO_ERROR)
+	{
+		std::cerr << "GL: " << err << ": " << glewGetErrorString(err) << std::endl;
+	}
 }
 
 

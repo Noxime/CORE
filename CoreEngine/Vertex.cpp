@@ -4,10 +4,10 @@
 
 Vertex::Vertex()
 {
-	Vertex(Vector3f(), Vector2f(), Vector2f(), Vector3f(), Vector3f());
+	Vertex(glm::vec3(), glm::vec2(), glm::vec2(), glm::vec3(), glm::vec3());
 }
 
-Vertex::Vertex(Vector3f position, Vector2f texcoord0, Vector2f texcoord1, Vector3f normal, Vector3f tangent)
+Vertex::Vertex(glm::vec3 position, glm::vec2 texcoord0, glm::vec2 texcoord1, glm::vec3 normal, glm::vec3 tangent)
 {
 	m_position           = position;
 	m_texcoord_primary   = texcoord0;
@@ -21,27 +21,27 @@ Vertex::~Vertex()
 {
 }
 
-Vector3f Vertex::getPos()
+glm::vec3 Vertex::getPos()
 {
 	return m_position;
 }
 
-Vector2f Vertex::getTex0()
+glm::vec2 Vertex::getTex0()
 {
 	return m_texcoord_primary;
 }
 
-Vector2f Vertex::getTex1()
+glm::vec2 Vertex::getTex1()
 {
 	return m_texcoord_secondary;
 }
 
-Vector3f Vertex::getNorm()
+glm::vec3 Vertex::getNorm()
 {
 	return m_normal;
 }
 
-Vector3f Vertex::getTang()
+glm::vec3 Vertex::getTang()
 {
 	return m_tangent;
 }

@@ -48,12 +48,6 @@
     <ClCompile Include="RenderingEngine.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Vector3f.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector2f.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Vertex.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
@@ -93,12 +87,6 @@
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="BUILD_OPTIONS.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3f.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector2f.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="Vertex.h">

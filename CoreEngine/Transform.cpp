@@ -4,10 +4,10 @@
 
 Transform::Transform()
 {
-	Transform(Vector3f(), Quaternion(), Vector3f());
+	Transform(glm::vec3(), Quaternion(), glm::vec3());
 }
 
-Transform::Transform(Vector3f position, Quaternion rotation, Vector3f scale)
+Transform::Transform(glm::vec3 position, Quaternion rotation, glm::vec3 scale)
 {
 	m_position = position;
 	m_rotation = rotation;
@@ -19,7 +19,7 @@ Transform::~Transform()
 {
 }
 
-Vector3f Transform::getPosition()
+glm::vec3 Transform::getPosition()
 {
 	return m_position;
 }
@@ -29,12 +29,12 @@ Quaternion Transform::getRotation()
 	return m_rotation;
 }
 
-Vector3f Transform::getScale()
+glm::vec3 Transform::getScale()
 {
 	return m_scale;
 }
 
-void Transform::setPosition(Vector3f position)
+void Transform::setPosition(glm::vec3 position)
 {
 	m_position = position;
 }
@@ -44,7 +44,7 @@ void Transform::setRotation(Quaternion rotation)
 	m_rotation = rotation;
 }
 
-void Transform::setScale(Vector3f scale)
+void Transform::setScale(glm::vec3 scale)
 {
 	m_scale = scale;
 }
