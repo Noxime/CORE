@@ -45,30 +45,38 @@ int main()
 	uint64_t frameCounter = 0;
 	clock_t nextTime = clock() + CLOCKS_PER_SEC;
 
-
+	r.setClearColor(glm::vec3(1, 0.66, 0));
+	
 	while (r.run())
 	{
 
 		r.setUniform3f(s, "uTest", glm::vec3(0, 1, 1));
 
-
-		r.clearFrame();
+		
 		r.drawMesh(m, s);
-
-
 
 		if (clock() > nextTime)
 		{
 			
 
 			nextTime = clock() + CLOCKS_PER_SEC;
-			std::cout << "Render: " << 1.0 / frameCounter << "ms, in FPS: " << frameCounter << std::endl;
+			std::cout << "Render: " << 1000.0 / frameCounter << "ms, in FPS: " << frameCounter << std::endl;
 			frameCounter = 0;
 		}
 
 
 		frameCounter++;
 	}
+	
+	/*
+	r.run();
+	//r.setUniform3f(s, "uTest", glm::vec3(0, 1, 1));
+	r.drawMesh(m, s);
+
+
+
+	//*/
+
 
 	
 	return 0;

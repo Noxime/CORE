@@ -21,13 +21,21 @@ public:
 	Shader makeShader(std::vector<char> vert, std::vector<char> frag);
 	Mesh   makeMesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices);
 
+	void setClearColor(glm::vec3 color);
+
 	void setUniform2f(Shader target, std::string name, glm::vec2 vec);
 	void setUniform3f(Shader target, std::string name, glm::vec3 vec);
 
-	void clearFrame();
+	
 	void drawMesh(Mesh mesh, Shader shader);
 
 private:
+
+	struct UniformBufferObject {
+		glm::mat4 model;
+		glm::mat4 view;
+		glm::mat4 proj;
+	};
 
 	VkInstance                                            m_instance;                 //Vulkan instance
 	VkDebugReportCallbackEXT                              m_callback;                 //Debug callback
@@ -49,9 +57,10 @@ private:
 	std::vector<VkCommandBuffer>                          m_commandBuffers;           //Multithread this bitch
 	VkSemaphore                                           m_imageAvailableSemaphore;  //We have got the image and were ready to render
 	VkSemaphore                                           m_renderFinishedSemaphore;  //We have got the render and were ready to present
-
-	bool m_clearQueued = false;
-
+	glm::vec3                                             m_clearColor;
+	VkDescriptorSetLayout                                 m_matrixDSL; //Descriptor set layout for matrices
+	VkDescriptorPool                                      m_matrixDP;
+	VkDescriptorSet                                       m_matrixDS;
 	
 
 	uint32_t                             m_currentShader = 0;
@@ -64,6 +73,11 @@ private:
 	std::map<uint32_t, VkDeviceMemory> m_vertexMemories;
 	std::map<uint32_t, VkBuffer>       m_indexBuffers;
 	std::map<uint32_t, VkDeviceMemory> m_indexMemories;
+
+	VkBuffer       m_uniformStagingBuffer;
+	VkDeviceMemory m_uniformStagingBufferMemory;
+	VkBuffer       m_uniformBuffer;
+	VkDeviceMemory m_uniformBufferMemory;
 
 	/*
 	std::vector<Vertex> exampleVertices = {
@@ -82,6 +96,8 @@ private:
 	void reRecordCmdBuf(uint32_t vc, uint32_t vertexBuf);
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &memory);
 	void copyBuffer(VkBuffer source, VkBuffer destination, VkDeviceSize size);
+	void updateUniformBuffer();
+
 
 	void initInstance();
 	void initDebugCallback();
@@ -100,6 +116,10 @@ private:
 	void initCommandBuffers();
 	void initSemaphores();
 
+	void initDescriptorSetLayout();
+	void initMatrixBuffer();
+	void initDescriptorPool();
+	void initDescriptorSet();
 
 
 	Window *m_window                              = nullptr;

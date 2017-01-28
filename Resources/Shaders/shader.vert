@@ -29,8 +29,8 @@ out gl_PerVertex {
 
 
 void main() {
-    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(vPosition, 1.0);
-	//gl_Position = vec4(vPosition, 1.0);
+    //gl_Position = ubo.proj * ubo.view * ubo.model * vec4(vPosition, 1.0);
+	gl_Position = vec4(vPosition, 1.0);
 	fPosition  = vPosition;
 	fTexcoord0 = vTexcoord0;
 	fTexcoord1 = vTexcoord1;

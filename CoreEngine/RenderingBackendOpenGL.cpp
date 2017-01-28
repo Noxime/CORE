@@ -217,6 +217,9 @@ void RenderingEngine::setUniform3f(Shader target, std::string name, glm::vec3 ve
 
 void RenderingEngine::drawMesh(Mesh mesh, Shader shader)
 {
+	glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glBindBuffer(GL_ARRAY_BUFFER,         mesh.getVBO());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.getEB());
 	glUseProgram(shader.getId());
@@ -225,6 +228,12 @@ void RenderingEngine::drawMesh(Mesh mesh, Shader shader)
 
 	glDrawElements(GL_TRIANGLES, mesh.getIndexCount(), GL_UNSIGNED_INT, 0);
 	//glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	GLint err = glGetError();
+	if (err != GL_NO_ERROR)
+	{
+		std::cerr << "GL: " << err << ": " << glewGetErrorString(err) << std::endl;
+	}
 }
 
 
@@ -253,20 +262,6 @@ Window *RenderingEngine::createWindow(uint32_t width, uint32_t height, std::stri
 
 	return m_window;
 }
-
-void RenderingEngine::clearFrame()
-{
-	
-	glClearColor(1, 0, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	GLint err = glGetError();
-	if (err != GL_NO_ERROR)
-	{
-		std::cerr << "GL: " << err << ": " << glewGetErrorString(err) << std::endl;
-	}
-}
-
 
 
 
